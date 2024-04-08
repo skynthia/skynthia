@@ -1,19 +1,13 @@
+s.boot;
+
+
+
+~b1 = Buffer.read(s, "C:/Users/Autumn/Documents/skynthia/samples/ahh_female.wav");
+~b2 = Buffer.read(s, "C:/Users/Autumn/Documents/skynthia/samples/ahh_chorus.wav");
 
 (
-a = {
-	var sig;
-	sig = SinOsc.ar([220, 880], mul: 0.05);
-	Out.ar(0, sig);
-}.play;
-)
-a.free;
-
-
-~b1 = Buffer.read(s, "C:/Users/AUTUM/Documents/skynthia/samples/ahh_female.wav");
-~b2 = Buffer.read(s, "C:/Users/AUTUM/Documents/skynthia/samples/ahh_chorus.wav");
-(
-SynthDef(\pb, {| out = 0, b1 = 0, b2 = 0, pitch = 0, gate = 0 |
-	var sig, pb1, pb2, ln;
+SynthDef(\pb, {| out = 0, b1 = 0, b2 = 0, pitch = 0, gate = 0, noise = 1, noise2 = 0.5 |
+	var sig, pb1, pb2, ln, chaos;
 	ln = LFNoise2.ar(0.1, 0.5, 0.5);
 	pb1 = PlayBuf.ar(2, b1,
 		rate: BufRateScale.kr(b1) * pow(2, pitch/12),
@@ -26,31 +20,69 @@ SynthDef(\pb, {| out = 0, b1 = 0, b2 = 0, pitch = 0, gate = 0 |
 	sig = Mix.new([ln*pb1, (1-ln)*pb2]);
 	sig = GVerb.ar(sig, 100, 5);
 	sig = sig * EnvGen.kr(Env.asr(3.0, 1.0, 5.0), gate);
-  Out.ar(out, sig*0.5);
+	sig = Disintegrator.ar(sig, noise2, noise);
+	sig = Compander.ar(sig, sig,
+        thresh: 0.2,
+        slopeBelow: 1,
+        slopeAbove: 0.1,
+        clampTime:  0.01,
+        relaxTime:  0.01
+    );
+	Out.ar(out, sig*0.5);
 }).add;
 )
-a = Synth(\pb, [\out, 0, \b1, ~b1, \b2, ~b2]);
+a = Synth(\pb, [\out, 0, \b1, ~b1, \b2, ~ b2]);
+a.set(\gate, 1);
 a.set(\gate, 0);
+a.set(\pitch, 12);
+a.set(\noise, -0.2);
 a.free;
 
+
+b = [27, 26, 27];
+c = 0;
+w = 0.2;
 (
-SynthDef(\test, { |gate = 0|
-	var sig = SinOsc.ar(
-        LFNoise1.ar(4, 400, 450),
-        0, 0.2);
-	//var env = Env([0, 1], [0.5],);
-	sig = sig * EnvGen.kr(Env.asr, gate);
-	Out.ar(0, sig!2*0.5);
-}).add;
+r = Routine {
+	inf.do({
+		a.set(\pitch, b[c % b.size]);
+		c = c + 1;
+		c.postln;
+		w = 0.6 - w;
+		w.wait;
+	});
+}.play;
 )
+r.stop;
 
-a = Synth(\test);
-a.set(\gate, 0);
-a.release(2);
 
-pow(2, 0);
+s.quit;
 
-{ var freq = 1000; [LFNoise0.ar(freq), Impulse.ar(freq)] }.plot
-(BufFrames.kr(~b1)/2).postln
 
-Project
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
