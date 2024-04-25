@@ -1,5 +1,5 @@
 const osc = require("osc");
-const { SerialPort } = require("serialport");
+const { SerialPort, ReadlineParser } = require("serialport");
 
 const udpPort = new osc.UDPPort({
     // My port
@@ -14,23 +14,38 @@ const udpPort = new osc.UDPPort({
 
 udpPort.open();
 
-//const serialport = new SerialPort({ path: 'COM3', baudRate: 9600 });
-//console.log(SerialPort.list());
+let serialport;
+let parser;
 
-function sendToSC() {
+SerialPort.list().then(function(ports){
+  let found = false;
+  ports.forEach(port => {
+    // correct format for serial ports on Windows
+    if (port.path.match(/COM[0-9]/)) {
+      found = true;
+      console.log("Opening port " + port.path);
+      serialport = new SerialPort({ path: port.path, baudRate: 9600 });
+      parser = new ReadlineParser()
+      serialport.pipe(parser)
+      parser.on('data', sendToSC)
+    }
+  })
+  if (!found) {
+    console.error("No valid port found");
+  }
+});
+
+function sendToSC(a) {
   let r = Math.random();
   let msg = {
     address: "/test",
     args: [{
       "type": "i",
-      "value": 0
-    }, {
-      "type": "f",
-      "value": r
+      "value": a
     }]
   }
-  console.log("Sending " + r);
+  console.log("Sending " + a);
   udpPort.send(msg);
 }
 
-let clock = setInterval(sendToSC, 500);
+//let clock = setInterval(sendToSC, 500);

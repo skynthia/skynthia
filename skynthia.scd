@@ -3,13 +3,12 @@ s.boot;
 (
 f = { |msg, time, addr|
 	if (msg[0] == '/test') {
-		msg[1].postln;
-		msg[2].postln;
+		a.set(\gate, msg[1]);
 	}
 };
 thisProcess.addOSCRecvFunc(f);
 );
-//thisProcess.removeOSCRecvFunc(f);
+thisProcess.removeOSCRecvFunc(f);
 
 
 ~b1 = Buffer.read(s, "C:/Users/Autumn/Documents/skynthia/samples/ahh_female.wav");
