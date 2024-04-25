@@ -1,5 +1,15 @@
 s.boot;
 
+(
+f = { |msg, time, addr|
+	if (msg[0] == '/test') {
+		msg[1].postln;
+		msg[2].postln;
+	}
+};
+thisProcess.addOSCRecvFunc(f);
+);
+//thisProcess.removeOSCRecvFunc(f);
 
 
 ~b1 = Buffer.read(s, "C:/Users/Autumn/Documents/skynthia/samples/ahh_female.wav");
@@ -37,23 +47,6 @@ a.set(\gate, 0);
 a.set(\pitch, 12);
 a.set(\noise, -0.2);
 a.free;
-
-
-b = [27, 26, 27];
-c = 0;
-w = 0.2;
-(
-r = Routine {
-	inf.do({
-		a.set(\pitch, b[c % b.size]);
-		c = c + 1;
-		c.postln;
-		w = 0.6 - w;
-		w.wait;
-	});
-}.play;
-)
-r.stop;
 
 
 s.quit;
