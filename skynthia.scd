@@ -2,8 +2,9 @@ s.boot;
 
 (
 f = { |msg, time, addr|
-	if (msg[0] == '/test') {
-		a.set(\gate, msg[1]);
+	if (msg[0] == '/drum_hit') {
+    //msg[1].postln;
+    //Synth(\gabberkick);
 	}
 };
 thisProcess.addOSCRecvFunc(f);
@@ -49,11 +50,6 @@ a.free;
 
 
 s.quit;
-
-
-
-
-
 
 
 

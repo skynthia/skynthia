@@ -2,6 +2,8 @@ const osc = require("osc");
 const { SerialPort, ReadlineParser } = require("serialport");
 const drums = require("./drums");
 
+let clock = 0;
+
 const udpPort = new osc.UDPPort({
     // My port
     localAddress: "127.0.0.1",
@@ -28,13 +30,23 @@ SerialPort.list().then(function(ports){
       serialport = new SerialPort({ path: port.path, baudRate: 9600 });
       parser = new ReadlineParser()
       serialport.pipe(parser)
-      parser.on('data', sendToSC)
+      parser.on('data', arduinoIn)
     }
   })
   if (!found) {
     console.error("No valid port found");
   }
 });
+
+function arduinoIn(value) {
+  switch (value[0]) {
+    case "d":
+      drums.arduinoIn(value);
+      break;
+    default:
+      console.error("No matching handler for Arduino message " + value)
+  }
+}
 
 function sendToSC(a) {
   let r = Math.random();
@@ -49,4 +61,31 @@ function sendToSC(a) {
   udpPort.send(msg);
 }
 
-//let clock = setInterval(sendToSC, 500);
+function drumbeat() {
+  let hits = drums.getHits(clock % 16);
+  clock++;
+  // if drums are off or no hits
+  if (!drums.DRUMS_ON || !hits.length) {
+    return;
+  }
+
+  let msg = {
+    address: "/drum_hit",
+    args: []
+  }
+
+  for (let i = 0; i < hits.length; i++) {
+    let arg = {
+      type: "i",
+      value: hits[i]
+    }
+
+    msg.args.push(arg);
+  }
+
+  console.log("sending hits for voices: " + hits);
+  
+  udpPort.send(msg);
+}
+
+let metro = setInterval(drumbeat, 500);
