@@ -1,5 +1,6 @@
 const osc = require("osc");
 const { SerialPort, ReadlineParser } = require("serialport");
+const drums = require("./drums");
 
 const udpPort = new osc.UDPPort({
     // My port
