@@ -7,7 +7,118 @@
       false, false, false, false, 
       false, false, false, false
     ],
-    "note": "These are buckets corresponding to the probability of this voice happening on that hit. Index of the array is % probability, e.g. index 10 is 100% probability",
-    "probs": [[], [9], [1], [5, 13], [], [3, 7, 11], [15, 2, 6, 14], [], [4, 8, 12], [10], [0]]
+    "probs": [[], [9], [1], [5, 13], [], [3, 7, 11], [15, 2, 6, 14], [], [4, 8, 12], [10], [0]],
+    "max": 16,
+    "note": "'probs' is an array of buckets corresponding to the probability of this voice happening on that hit. Index of the array is % probability, e.g. index 10 is 100% probability"
+  },
+  {
+    "name": "long_kick",
+    "hits": [
+      false, false, false, false, 
+      false, false, false, false, 
+      false, false, false, false, 
+      false, false, false, false
+    ],
+    "probs": [[], [], [], [], [], [], [], [], [], [], []],
+    "max": 16
+  },
+  {
+    "name": "low_stab",
+    "hits": [
+      false, false, false, false, 
+      false, false, false, false, 
+      false, false, false, false, 
+      false, false, false, false
+    ],
+    "probs": [[], [], [], [], [], [], [], [], [], [], []],
+    "max": 16
+  },
+  {
+    "name": "high_stab",
+    "hits": [
+      false, false, false, false, 
+      false, false, false, false, 
+      false, false, false, false, 
+      false, false, false, false
+    ],
+    "probs": [[], [], [], [], [], [], [], [], [], [], []],
+    "max": 16
+  },
+  {
+    "name": "snare",
+    "hits": [
+      false, false, false, false, 
+      false, false, false, false, 
+      false, false, false, false, 
+      false, false, false, false
+    ],
+    "probs": [[], [], [], [], [], [], [], [], [], [], []],
+    "max": 16
+  },
+  {
+    "name": "open_hat",
+    "hits": [
+      false, false, false, false, 
+      false, false, false, false, 
+      false, false, false, false, 
+      false, false, false, false
+    ],
+    "probs": [[], [], [], [], [], [], [], [], [], [], []],
+    "max": 16
+  },
+  {
+    "name": "low_oontz",
+    "hits": [
+      false, false, false, false, 
+      false, false, false, false, 
+      false, false, false, false, 
+      false, false, false, false
+    ],
+    "probs": [[], [], [], [], [], [], [], [], [], [], []],
+    "max": 16
+  },
+  {
+    "name": "high_oontz",
+    "hits": [
+      false, false, false, false, 
+      false, false, false, false, 
+      false, false, false, false, 
+      false, false, false, false
+    ],
+    "probs": [[], [], [], [], [], [], [], [], [], [], []],
+    "max": 16
+  },
+  {
+    "name": "ding",
+    "hits": [
+      false, false, false, false, 
+      false, false, false, false, 
+      false, false, false, false, 
+      false, false, false, false
+    ],
+    "probs": [[], [], [], [], [], [], [], [], [], [], []],
+    "max": 16
+  },
+  {
+    "name": "clop",
+    "hits": [
+      false, false, false, false, 
+      false, false, false, false, 
+      false, false, false, false, 
+      false, false, false, false
+    ],
+    "probs": [[], [], [], [], [], [], [], [], [], [], []],
+    "max": 16
+  },
+  {
+    "name": "gong",
+    "hits": [
+      false, false, false, false, 
+      false, false, false, false, 
+      false, false, false, false, 
+      false, false, false, false
+    ],
+    "probs": [[], [], [], [], [], [], [], [], [], [], []],
+    "max": 2
   }
 ]
