@@ -29,7 +29,7 @@ function generateHits(voice) {
   modifier = Math.random() > 0.5 ? modifier : -1 * modifier; // randomly + or -
   let num_hits = density_of_hits + modifier;
   num_hits = num_hits < 1 ? 1 : num_hits; // never less than 1
-  num_hits = num_hits > 16 ? 16 : num_hits; // never more than 16
+  num_hits = num_hits > drum.max ? drum.max : num_hits; // never more than 16
 
   for (let i = 0; i < num_hits; i++) {
     for (let j = probs.length - 1; j >= 0; j--) {
