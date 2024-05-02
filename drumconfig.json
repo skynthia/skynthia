@@ -8,10 +8,42 @@
       false, false, false, false
     ],
     "probs": [[], [9], [1], [5, 13], [], [3, 7, 11], [15, 2, 6, 14], [], [4, 8, 12], [10], [0]],
-    "voice_probs": [[], [], [], [], [], [8, 9, 10, 1], [4, 5], [2, 3], [], [], []],
+    "voice_probs": [
+      {
+        "prob": 0.8,
+        "voice": 2
+      }, 
+      {
+        "prob": 0.8,
+        "voice": 3
+      }, 
+      {
+        "prob": 0.6,
+        "voice": 4
+      },
+      {
+        "prob": 0.6,
+        "voice": 5
+      }, 
+      {
+        "prob": 0.4,
+        "voice": 8
+      },
+      {
+        "prob": 0.4,
+        "voice": 9
+      }, 
+      {
+        "prob": 0.4,
+        "voice": 10
+      }, 
+      {
+        "prob": 0.2,
+        "voice": 1
+      }
+    ],
     "max": 16,
-    "note1": "'probs' is an array of buckets corresponding to the probability of this voice happening on that hit. Index of the array is % probability, e.g. index 10 is 100% probability",
-    "note2": "'voice_probs' is an array of which voices are more likely to come after this one."
+    "note1": "'probs' is an array of buckets corresponding to the probability of this voice happening on that hit. Index of the array is % probability, e.g. index 10 is 100% probability"
   },
   {
     "name": "long_kick",

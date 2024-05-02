@@ -62,7 +62,7 @@ function sendToSC(a) {
 }
 
 function drumbeat() {
-  let hits = drums.getHits(clock % 16);
+  let hits = drums.getHits(clock % 16, clock % 64);
   clock++;
   // if drums are off or no hits
   if (!drums.DRUMS_ON || !hits.length) {
