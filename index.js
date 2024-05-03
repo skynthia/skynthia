@@ -65,7 +65,7 @@ function drumbeat() {
   let hits = drums.getHits(clock % 16, clock % 64);
   clock++;
   // if drums are off or no hits
-  if (!drums.DRUMS_ON || !hits.length) {
+  if (!hits || !hits.length) {
     return;
   }
 
@@ -88,4 +88,4 @@ function drumbeat() {
   udpPort.send(msg);
 }
 
-let metro = setInterval(drumbeat, 500);
+let metro = setInterval(drumbeat, 150);
