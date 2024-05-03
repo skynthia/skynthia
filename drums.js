@@ -54,15 +54,30 @@ function generateHits(voice) {
   num_hits = num_hits < 1 ? 1 : num_hits; // never less than 1
   num_hits = num_hits > drum.max ? drum.max : num_hits; // never more than 16
 
+  // TODO: Make this more efficient??
   for (let i = 0; i < num_hits; i++) {
-    for (let j = probs.length - 1; j >= 0; j--) {
-      let rand = Math.random();
-      if (probs[j].length && rand < j/10) {
-        let idx = Math.floor(Math.random() * probs[j].length);
-        let hit = probs[j][idx];
-        drum.hits[hit] = true;
-        probs[j].splice(idx, 1); // remove the hit we just generated
+    let found_hit = false;
+    while (!found_hit) {
+      for (let j = probs.length - 1; j >= 0; j--) {
+        if (drum.equal_prob) {
+          let note = Math.floor(Math.random() * 16);
+          if (!drum.hits[note]) {
+            drum.hits[note] = true;
+            found_hit = true;
+          }
+        }
+        else {
+          let rand = Math.random();
+          if (probs[j].length && rand < j/10) {
+            let idx = Math.floor(Math.random() * probs[j].length);
+            let hit = probs[j][idx];
+            drum.hits[hit] = true;
+            probs[j].splice(idx, 1); // remove the hit we just generated
+            found_hit = true;
+          }
+        }
         break;
+        
       }
     }
   }

@@ -7,44 +7,59 @@
       false, false, false, false, 
       false, false, false, false
     ],
-    "probs": [[], [9], [1], [5, 13], [], [3, 7, 11], [15, 2, 6, 14], [], [4, 8, 12], [10], [0]],
+    "equal_prob": false,
+    "probs": [
+      {
+        "prob": 1.0,
+        "notes": [0]
+      },
+      {
+        "prob": 0.8,
+        "notes": [4, 8, 10, 12]
+      },
+      {
+        "prob": 0.6,
+        "notes": [2, 6, 14, 15]
+      },
+      {
+        "prob": 0.4,
+        "notes": [3, 7, 11]
+      },
+      {
+        "prob": 0.2,
+        "notes": [1, 5, 9, 13]
+      }
+    ],
     "voice_probs": [
       {
         "prob": 0.8,
-        "voice": 2
-      }, 
-      {
-        "prob": 0.8,
-        "voice": 3
+        "voices": [2, 3],
+        "voice_names": ["low_stab", "high_stab"]
       }, 
       {
         "prob": 0.6,
-        "voice": 4
+        "voices": [4, 5],
+        "voice_names": ["snare", "open_hat"]
+      }, 
+      {
+        "prob": 0.4,
+        "voices": [8, 9, 10],
+        "voice_names": ["ding", "clop", "gong"]
       },
-      {
-        "prob": 0.6,
-        "voice": 5
-      }, 
-      {
-        "prob": 0.4,
-        "voice": 8
-      },
-      {
-        "prob": 0.4,
-        "voice": 9
-      }, 
-      {
-        "prob": 0.4,
-        "voice": 10
-      }, 
       {
         "prob": 0.2,
-        "voice": 1
+        "voices": [1],
+        "voice_names": ["long_kick"]
       }
     ],
     "max": 16,
     "note1": "'probs' is an array of buckets corresponding to the probability of this voice happening on that hit. Index of the array is % probability, e.g. index 10 is 100% probability"
   },
+
+
+
+
+
   {
     "name": "long_kick",
     "hits": [
@@ -53,10 +68,33 @@
       false, false, false, false, 
       false, false, false, false
     ],
-    "probs": [[], [], [], [], [], [], [], [], [], [], []],
+    "equal_prob": false,
+    "probs": [
+      {
+        "prob": 1.0,
+        "notes": [0]
+      },
+      {
+        "prob": 0.9,
+        "notes": [4, 8, 12]
+      },
+      {
+        "prob": 0.6,
+        "notes": [2, 6, 10, 14]
+      },
+      {
+        "prob": 0.4,
+        "notes": [1, 3, 5, 7, 9, 11, 13, 15]
+      }
+    ],
     "voice_probs": [[], [], [], [], [], [], [], [], [], [], []],
     "max": 10
   },
+
+
+
+
+
   {
     "name": "low_stab",
     "hits": [
@@ -65,10 +103,33 @@
       false, false, false, false, 
       false, false, false, false
     ],
-    "probs": [[], [], [], [], [], [], [], [], [], [], []],
+    "equal_prob": false,
+    "probs": [
+      {
+        "prob": 0.8,
+        "notes": [4, 12]
+      },
+      {
+        "prob": 0.6,
+        "notes": [2, 6, 10, 14]
+      },
+      {
+        "prob": 0.5,
+        "notes": [3, 7, 11, 15]
+      },
+      {
+        "prob": 0.3,
+        "notes": [0, 8, 1, 5, 9, 13]
+      }
+    ],
     "voice_probs": [[], [], [], [], [], [], [], [], [], [], []],
     "max": 16
   },
+
+
+
+
+
   {
     "name": "high_stab",
     "hits": [
@@ -77,10 +138,29 @@
       false, false, false, false, 
       false, false, false, false
     ],
-    "probs": [[], [], [], [], [], [], [], [], [], [], []],
+    "equal_prob": false,
+    "probs": [
+      {
+        "prob": 0.9,
+        "notes": [2, 6, 10, 14]
+      },
+      {
+        "prob": 0.7,
+        "notes": [0, 4, 8, 12]
+      },
+      {
+        "prob": 0.5,
+        "notes": [1, 3, 5, 7, 9, 11, 13, 15]
+      }
+    ],
     "voice_probs": [[], [], [], [], [], [], [], [], [], [], []],
     "max": 16
   },
+
+
+
+
+
   {
     "name": "snare",
     "hits": [
@@ -89,10 +169,33 @@
       false, false, false, false, 
       false, false, false, false
     ],
-    "probs": [[], [], [], [], [], [], [], [], [], [], []],
+    "equal_prob": false,
+    "probs": [
+      {
+        "prob": 0.7,
+        "notes": [2, 4, 6, 10, 12, 14]
+      },
+      {
+        "prob": 0.6,
+        "notes": [3, 7, 11, 15]
+      },
+      {
+        "prob": 0.3,
+        "notes": [1, 5, 9, 13]
+      },
+      {
+        "prob": 0.1,
+        "notes": [0, 8]
+      }
+    ],
     "voice_probs": [[], [], [], [], [], [], [], [], [], [], []],
     "max": 12
   },
+
+
+
+
+
   {
     "name": "open_hat",
     "hits": [
@@ -101,10 +204,15 @@
       false, false, false, false, 
       false, false, false, false
     ],
-    "probs": [[], [], [], [], [], [], [], [], [], [], []],
+    "equal_prob": true,
     "voice_probs": [[], [], [], [], [], [], [], [], [], [], []],
     "max": 16
   },
+
+
+
+
+
   {
     "name": "low_oontz",
     "hits": [
@@ -113,10 +221,33 @@
       false, false, false, false, 
       false, false, false, false
     ],
-    "probs": [[], [], [], [], [], [], [], [], [], [], []],
+    "equal_prob": false,
+    "probs": [
+      {
+        "prob": 1.0,
+        "notes": [0]
+      },
+      {
+        "prob": 0.7,
+        "notes": [4, 8, 12]
+      },
+      {
+        "prob": 0.5,
+        "notes": [3, 7, 11, 15]
+      },
+      {
+        "prob": 0.4,
+        "notes": [1, 2, 5, 6, 9, 10, 13, 14]
+      }
+    ],
     "voice_probs": [[], [], [], [], [], [], [], [], [], [], []],
     "max": 16
   },
+
+
+
+
+
   {
     "name": "high_oontz",
     "hits": [
@@ -125,10 +256,29 @@
       false, false, false, false, 
       false, false, false, false
     ],
-    "probs": [[], [], [], [], [], [], [], [], [], [], []],
+    "equal_prob": false,
+    "probs": [
+      {
+        "prob": 0.9,
+        "notes": [2, 6, 10, 14]
+      },
+      {
+        "prob": 0.7,
+        "notes": [1, 3, 5, 7, 9, 11, 13, 15]
+      },
+      {
+        "prob": 0.4,
+        "notes": [0, 4, 8, 12]
+      }
+    ],
     "voice_probs": [[], [], [], [], [], [], [], [], [], [], []],
     "max": 16
   },
+
+
+
+
+
   {
     "name": "ding",
     "hits": [
@@ -137,9 +287,14 @@
       false, false, false, false, 
       false, false, false, false
     ],
-    "probs": [[], [], [], [], [], [], [], [], [], [], []],
+    "equal_prob": true,
     "max": 2
   },
+
+
+
+
+
   {
     "name": "clop",
     "hits": [
@@ -148,9 +303,14 @@
       false, false, false, false, 
       false, false, false, false
     ],
-    "probs": [[], [], [], [], [], [], [], [], [], [], []],
+    "equal_prob": true,
     "max": 12
   },
+
+
+
+
+
   {
     "name": "gong",
     "hits": [
@@ -159,7 +319,7 @@
       false, false, false, false, 
       false, false, false, false
     ],
-    "probs": [[], [], [], [], [], [], [], [], [], [], []],
+    "equal_prob": true,
     "max": 2
   }
 ]
