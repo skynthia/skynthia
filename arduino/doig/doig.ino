@@ -1,18 +1,12 @@
-#include "Tentacle.h"
-
-Tentacle tentacle;
+#include <Servo.h>
+#include "Modes.h"
 
 void setup() {
-  tentacle = *new Tentacle();
+  Serial.begin(9600);
+  randomSeed(analogRead(A15));
+  setupTentacle();
 }
 
 void loop() {
-  tentacle.loopTentacle();
-}
-
-void setup_tentacles() {
-}
-
-void check_change_mode() {
-  
+  loopTentacle();
 }
