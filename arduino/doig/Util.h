@@ -1,5 +1,5 @@
-#ifndef Modes_h
-#define Modes_h
+#ifndef Util_h
+#define Util_h
 
 struct mode {
   int new_dest_prob;      // The probability of choosing new destinations, per move_freq, once destination is reached. Out of 100.
