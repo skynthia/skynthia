@@ -69,22 +69,22 @@ function drumbeat() {
     return;
   }
 
+  // add imperfections -- randomize by up to 10ms
+  for (let i = 0; i < hits.length; i++) {
+    setTimeout(() => { sendDrumHit(hits[i]) }, Math.random() * 10);
+  }
+}
+
+function sendDrumHit(hit) {
   let msg = {
     address: "/drum_hit",
-    args: []
+    args: [
+      {
+        type: "i",
+        value: hit
+      }
+    ]
   }
-
-  for (let i = 0; i < hits.length; i++) {
-    let arg = {
-      type: "i",
-      value: hits[i]
-    }
-
-    msg.args.push(arg);
-  }
-
-  console.log("sending hits for voices: " + hits);
-  
   udpPort.send(msg);
 }
 
