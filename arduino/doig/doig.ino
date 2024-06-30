@@ -37,6 +37,7 @@ void loop() {
 void checkInputs() {
   // Are we allowing programming?
   fisting = !digitalRead(fisting_pin);
+  tentacle_on = fisting; // for now
   if (!fisting) {
     return;
   }
