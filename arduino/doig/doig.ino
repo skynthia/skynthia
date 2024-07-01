@@ -32,29 +32,39 @@ void loop() {
   if (tentacle_on) {
     loopTentacle();
   }
+  delay(10);
 }
 
 void checkInputs() {
   // Are we allowing programming?
-  fisting = !digitalRead(fisting_pin);
-  tentacle_on = fisting; // for now
+  int fisting_new = !digitalRead(fisting_pin);
+  // Signal that we're reading to receive programming via a haptic signal
+  if (fisting_new != fisting && fisting_new) {
+    fistingHaptic();
+  }
+  
+  fisting = fisting_new;
   if (!fisting) {
     return;
   }
 
   for (int i = 0; i < NUM_INPUTS; i++) {
     int *input_pins = inputs[i];
-    input_values[i] = 0;
+    int binary_value = 0;
+    int count = 0;
     
     for (int i = 0; i < input_pin_count[i]; i++) {
-      input_counts[i] = 0;
       int reading = digitalRead(input_pins[i]);
-      input_values[i] = input_values[i] | (!reading << i);
+      binary_value = binary_value | (!reading << i);
       if (!reading) {
-        input_count[i]++;
+        count++;
       }
     }
-  
-    pulse_count[i] = input_counts[i] * 2; // multiply by two because of on and then off
+
+    input_values[i] = binary_value;
+    // Value has changed since the last check
+    if (count != input_counts[i]) {
+      inputHaptic(count, input_pin_count[i]);
+    }
   }
 }

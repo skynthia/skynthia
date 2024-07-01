@@ -1,40 +1,45 @@
-bool fisting_haptic_pin = 52;
-bool voices_haptic_pin = 7;
-bool hits_haptic_pin = 6;
-int haptic_pins[NUM_INPUTS] = {voices_haptic_pin, hits_haptic_pin};
+bool haptic_pin = 52;
 
-int pulse_clock[NUM_INPUTS] = {0, 0};
-int pulse_count[NUM_INPUTS] = {0, 0};
-long ms[NUM_INPUTS];
-int pulse_length = 300;
-bool haptic_value[NUM_INPUTS] = {true, true};
+int pulse_clock = 0;
+int pulse_count = 0;
+int pulse_total = 8;
+long ms;
+int pulse_length[2] = {300, 300};
+bool haptic_value = true;
 
 void setupHaptics() {
-  for (int i = 0; i < NUM_INPUTS; i++) {
-    pinMode(haptic_pins[i], OUTPUT);
-    digitalWrite(haptic_pins[i], HIGH); // Because of how the transistor works, this turns the motor off
-    ms[i] = millis();
-  }
-  
-  pinMode(fisting_haptic_pin, OUTPUT);
-  digitalWrite(fisting_haptic_pin, HIGH);
+  pinMode(haptic_pin, OUTPUT);
+  digitalWrite(haptic_pin, HIGH); // Because of how the transistor works, this turns the motor off
+  ms = millis();
+}
+
+// two fast, 
+void fistingHaptic() {
+  pulse_length[0] = 150; // 150ms on, 150ms off
+  pulse_length[1] = 150;
+  pulse_count = 4; // on and then off, twice
+  pulse_total = 16;
+  pulse_clock = 0; // start at the beginning
+}
+
+void inputHaptic(int count, int total_pins) {
+  pulse_length[0] = 250; // TODO: different pulse lengths for each input, give a different "voice"
+  pulse_length[1] = 400;
+  pulse_count = count * 2; // multiply by two because of on and then off
+  pulse_total = total_pins * 2;
+  pulse_clock = 0;
 }
 
 void doHaptics() {
-  // fisting
-  digitalWrite(fisting_haptic_pin, !fisting);
-
-  for (int i = 0; i < NUM_INPUTS; i++) {
-    if (millis() - ms[i] >= pulse_length) {
-      if (pulse_clock[i] < pulse_count[i]) {
-        haptic_value[i] = !haptic_value[i];
-        digitalWrite(haptic_pins[i], haptic_value[i]);
-      }
-      else {
-        digitalWrite(haptic_pins[i], HIGH); // this turns it off
-      }
-      pulse_clock[i] = (pulse_clock[i] + 1) % 8;
-      ms[i] = millis();
+  if (millis() - ms >= pulse_length[haptic_value]) {
+    if (pulse_clock < pulse_count) {
+      haptic_value = !haptic_value;
+      digitalWrite(haptic_pin, haptic_value);
     }
+    else {
+      digitalWrite(haptic_pin, HIGH); // this turns it off
+    }
+    pulse_clock = (pulse_clock + 1) % pulse_total;
+    ms = millis();
   }
 }
