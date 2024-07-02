@@ -6,8 +6,9 @@
 bool tentacle_on = false;
 
 // inputs
-bool fisting = false;
-bool fisting_pin = 53;
+int fisting = 0;
+int fisting_new = 0;
+int fisting_pin = 53;
 
 int voice_pins[4] = {5, 4, 3, 2};
 int hit_pins[4] = {8, 9, 10, 11};
@@ -19,6 +20,8 @@ int input_counts[NUM_INPUTS] = {0, 0};
 
 void setup() {
   Serial.begin(9600);
+  Serial.println("Booting Doig...");
+  
   setupHaptics();
   
   randomSeed(analogRead(A15));
@@ -32,19 +35,20 @@ void loop() {
   if (tentacle_on) {
     loopTentacle();
   }
-  delay(10);
+  delay(100);
 }
 
 void checkInputs() {
   // Are we allowing programming?
-  int fisting_new = !digitalRead(fisting_pin);
+  fisting_new = !digitalRead(fisting_pin);
   // Signal that we're reading to receive programming via a haptic signal
   if (fisting_new != fisting && fisting_new) {
+    Serial.println("Accepting sensor input");
     fistingHaptic();
   }
-  
   fisting = fisting_new;
   if (!fisting) {
+    stopHaptics();
     return;
   }
 
@@ -52,10 +56,12 @@ void checkInputs() {
     int *input_pins = inputs[i];
     int binary_value = 0;
     int count = 0;
-    
-    for (int i = 0; i < input_pin_count[i]; i++) {
-      int reading = digitalRead(input_pins[i]);
-      binary_value = binary_value | (!reading << i);
+  
+    for (int j = 0; j < input_pin_count[i]; j++) {
+      int reading = digitalRead(input_pins[j]);
+      //Serial.print("Reading from pin ");
+      //Serial.println(input_pins[i]);
+      binary_value = binary_value | (!reading << j);
       if (!reading) {
         count++;
       }
@@ -64,7 +70,12 @@ void checkInputs() {
     input_values[i] = binary_value;
     // Value has changed since the last check
     if (count != input_counts[i]) {
+      Serial.print("changed sensor ");
+      Serial.print(i);
+      Serial.print(": ");
+      Serial.println(binary_value);
       inputHaptic(count, input_pin_count[i]);
+      input_counts[i] = count;
     }
   }
 }

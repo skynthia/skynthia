@@ -21,9 +21,10 @@ long last_mode_change;
 int time_diff;
 
 void setupTentacle() {
-  wave = {50, 20, 40, 50, 1, 5};
-  twitch = {30, 50, 80, 1000, 20, 50};
-  subtle = {80, 4, 10, 50, 2, 8};
+  Serial.println("Setting up tentacle...");
+  wave = {50, 20, 40, 50, 1, 5, "WAVE"};
+  twitch = {30, 50, 80, 1000, 20, 50, "TWCH"};
+  subtle = {80, 4, 10, 50, 2, 8, "SBTL"};
   modes[0] = &wave;
   modes[1] = &twitch;
   modes[2] = &subtle;
@@ -33,6 +34,8 @@ void setupTentacle() {
   }
   last_move = millis();
   checkModeChange(true);
+  Serial.print("Tentacle setup finished. Mode: ");
+  Serial.println(curr_mode->mode_name);
 }
 
 void loopTentacle() {
@@ -62,8 +65,6 @@ void checkModeChange(bool force) {
   // if we get down here, it's because we're changing modes
   // either forced or chance
   mode_num = random(3);
-  Serial.print("Mode: ");
-  Serial.println(mode_num);
   curr_mode = modes[mode_num];
   last_mode_change = millis();
   time_diff = curr_mode->move_freq + signedRandom(0, curr_mode->move_freq / 2.0);

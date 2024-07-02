@@ -8,6 +8,7 @@ struct mode {
   int move_freq;          // How often this mode takes a step, in milliseconds
   int min_step_size;      // The minimum size of step it takes each time it moves, in degrees
   int max_step_size;      // Max ""
+  String mode_name;
 };
 
 static int signedRandom(int min_val, int max_val) {
