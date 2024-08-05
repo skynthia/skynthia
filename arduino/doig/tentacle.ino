@@ -7,7 +7,7 @@ static int TWITCH = 1;
 static int SUBTLE = 2;
 
 Servo servos[NUM_TSERV];
-int servo_pins[NUM_TSERV] = {25, 27, 29};
+int servo_pins[NUM_TSERV] = {35, 37, 39};
 int pos[NUM_TSERV] = {0, 0, 0};
 int dest[NUM_TSERV] = {0, 0, 0};
 int step_size[NUM_TSERV] = {0, 0, 0};
@@ -31,6 +31,7 @@ void setupTentacle() {
   
   for (int i = 0; i < NUM_TSERV; i++) {
     servos[i].attach(servo_pins[i]);
+    servos[i].write(0);
   }
   last_move = millis();
   checkModeChange(true);
@@ -112,10 +113,11 @@ void checkMove() {
       }
     }
     servos[i].write(pos[i]);
+    /*
     Serial.print(pos[i]);
     Serial.print(":");
     Serial.print(dest[i]);
-    Serial.print("\t");
+    Serial.print("\t");*/
   }
-  Serial.println();
+  //Serial.println();
 }

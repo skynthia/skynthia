@@ -1,7 +1,7 @@
 #include <Servo.h>
 #include "Util.h"
 
-#define NUM_INPUTS 2
+#define NUM_INPUTS 3
 
 bool tentacle_on = false;
 
@@ -12,15 +12,29 @@ int fisting_pin = 53;
 
 int voice_pins[4] = {5, 4, 3, 2};
 int hit_pins[4] = {8, 9, 10, 11};
+int root_pins[3] = {23, 25, 27};
+int dyn_pins[2] = {A0, A1};
+int dyn_threshold = 900;
+int dyn_value = 0;
+int dyn_count_arr[2] = {0, 0};
+int dyn_count = 0;
 
-int *inputs[NUM_INPUTS] = {voice_pins, hit_pins};
-int input_values[NUM_INPUTS] = {0, 0};            // Will be a binary number calculated from the input pins
-int input_pin_count[NUM_INPUTS] = {4, 4};
-int input_counts[NUM_INPUTS] = {0, 0};
+int *inputs[NUM_INPUTS] = {voice_pins, hit_pins, root_pins};
+int input_values[NUM_INPUTS] = {0, 0, 0};            // Will be a binary number calculated from the input pins
+int input_pin_count[NUM_INPUTS] = {4, 4, 3};
+int input_counts[NUM_INPUTS] = {0, 0, 0};
+String input_names[NUM_INPUTS] = {"voice", "hits", "root"};
 
 void setup() {
   Serial.begin(9600);
   Serial.println("Booting Doig...");
+
+  for (int i = 0; i < NUM_INPUTS; i++) {
+    int *input_pins = inputs[i];
+    for (int j = 0; j < input_pin_count[i]; j++) {
+      pinMode(input_pins[j], INPUT);
+    }
+  }
   
   setupHaptics();
   
@@ -45,8 +59,16 @@ void checkInputs() {
   if (fisting_new != fisting && fisting_new) {
     Serial.println("Accepting sensor input");
     fistingHaptic();
+    dyn_value = 0; // always restart dynamism at 0 to make it work with input style
+    dyn_count_arr[0] = dyn_count_arr[1] = dyn_count = 0;
   }
+  else if (fisting_new != fisting && !fisting_new) {
+    Serial.print("dynamism set to ");
+    Serial.println(dyn_value);
+  }
+  
   fisting = fisting_new;
+
   if (!fisting) {
     stopHaptics();
     return;
@@ -58,11 +80,13 @@ void checkInputs() {
     int count = 0;
   
     for (int j = 0; j < input_pin_count[i]; j++) {
-      int reading = digitalRead(input_pins[j]);
-      //Serial.print("Reading from pin ");
-      //Serial.println(input_pins[i]);
-      binary_value = binary_value | (!reading << j);
-      if (!reading) {
+      int reading = !digitalRead(input_pins[j]);
+      /*Serial.print("Reading from pin ");
+      Serial.print(pin);
+      Serial.print(": ");
+      Serial.println(reading);*/
+      binary_value = binary_value | (reading << j);
+      if (reading) {
         count++;
       }
     }
@@ -71,11 +95,31 @@ void checkInputs() {
     // Value has changed since the last check
     if (count != input_counts[i]) {
       Serial.print("changed sensor ");
-      Serial.print(i);
+      Serial.print(input_names[i]);
       Serial.print(": ");
       Serial.println(binary_value);
-      inputHaptic(count, input_pin_count[i]);
+      //Serial.println(input_counts[i]);
+      inputHaptic(count, input_pin_count[i], i);
       input_counts[i] = count;
+    }
+  }
+
+  checkDyn();
+}
+
+void checkDyn() {
+  for (int j = 0; j < 2; j++) {
+    int reading = analogRead(dyn_pins[j]);
+    if (reading >= dyn_threshold) {
+      dyn_value = dyn_value | (1 << j);
+      dyn_count_arr[j] = 1;
+    }
+    // this is so stupid
+    int count = dyn_count_arr[0] + dyn_count_arr[1];
+    
+    if (count != dyn_count) {
+      inputHaptic(count, 2, 3);
+      dyn_count = count;
     }
   }
 }
