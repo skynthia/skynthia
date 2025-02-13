@@ -1,7 +1,10 @@
 #include <Servo.h>
+#include <SoftwareSerial.h>
 #include "Util.h"
 
 #define NUM_INPUTS 3
+
+SoftwareSerial HC12(24, 26); // HC-12 TX Pin, HC-12 RX Pin
 
 bool tentacle_on = false;
 
@@ -23,7 +26,8 @@ int *inputs[NUM_INPUTS] = {voice_pins, hit_pins, root_pins};
 int input_values[NUM_INPUTS] = {0, 0, 0};            // Will be a binary number calculated from the input pins
 int input_pin_count[NUM_INPUTS] = {4, 4, 3};
 int input_counts[NUM_INPUTS] = {0, 0, 0};
-String input_names[NUM_INPUTS] = {"voice", "hits", "root"};
+char input_names[NUM_INPUTS][4] = {"DENV", "DENH", "ROOT", "DYNM"};
+String friendly_input_names[NUM_INPUTS] = {"voice", "hits", "root"};
 
 void setup() {
   Serial.begin(9600);
@@ -101,10 +105,22 @@ void checkInputs() {
       //Serial.println(input_counts[i]);
       inputHaptic(count, input_pin_count[i], i);
       input_counts[i] = count;
+      sendToServer(i, input_counts[i]);
     }
   }
 
   checkDyn();
+}
+
+void sendToServer(int which, int val) {
+  HC12.write('d');
+  HC12.write(' ');
+  for (int i = 0; i < 4; i++) {
+    HC12.write(input_names[which][i]);
+  }
+  HC12.write(' ');
+  HC12.write(val);
+  HC12.write('\n');
 }
 
 void checkDyn() {
@@ -120,6 +136,7 @@ void checkDyn() {
     if (count != dyn_count) {
       inputHaptic(count, 2, 3);
       dyn_count = count;
+      sendToServer(3, dyn_count);
     }
   }
 }

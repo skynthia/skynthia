@@ -17,24 +17,25 @@ let turn_drums_off = false;
 
 function arduinoIn(value) {
   value = value.split(" ");
+  let num_val = value[2].charCodeAt(0); // get the int
   switch (value[1]) {
     case "HARD":
-      hardStartStop(Number(value[2]));
+      hardStartStop(num_val);
       break;
     case "ONOF":
-      setDrumsOn(Number(value[2]));
+      setDrumsOn(num_val);
       break;
     case "DENH":
-      setDensityOfHits(Number(value[2]));
+      setDensityOfHits(num_val);
       break;
     case "DENV":
-      setDensityOfVoices(Number(value[2]));
+      setDensityOfVoices(num_val);
       break;
     case "DYNM":
-      setDynamism(Number(value[2]));
+      setDynamism(num_val);
       break;
     case "ROOT":
-      setRootVoice(Number(value[2]));
+      setRootVoice(num_val);
       break;
   }
 }
@@ -221,7 +222,7 @@ function setRootVoice(value) {
   change_pattern = true;
   change_all_voices = true;
 }
-
+/*
 setRootVoice(0);
 setDensityOfHits(12);
 // todo: don't call generateHits in this function
@@ -263,6 +264,6 @@ setTimeout(() => {
 
 setTimeout(() => {
   hardStartStop(false);
-}, 95000);
+}, 95000);*/
 
 module.exports = {arduinoIn, getHits};
