@@ -1,6 +1,11 @@
 const osc = require("osc");
+const fs = require("fs");
 const { SerialPort, ReadlineParser } = require("serialport");
 const drums = require("./drums");
+
+const outputLog = fs.createWriteStream("./outputLog.txt");
+const errorsLog = fs.createWriteStream("./errorsLog.txt");
+const logger = new console.Console(outputLog, errorsLog);
 
 let clock = 0;
 
@@ -27,6 +32,7 @@ SerialPort.list().then(function(ports){
     if (port.path.match(/COM[0-9]+/)) {
       found = true;
       console.log("Opening port " + port.path);
+      logger.log("Opening port " + port.path);
       serialport = new SerialPort({ path: port.path, baudRate: 9600 });
       parser = new ReadlineParser()
       serialport.pipe(parser)
@@ -35,6 +41,7 @@ SerialPort.list().then(function(ports){
   })
   if (!found) {
     console.error("No valid port found");
+    logger.error("No valid port found");
   }
 });
 
