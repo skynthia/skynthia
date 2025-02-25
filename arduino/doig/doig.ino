@@ -1,10 +1,7 @@
 #include <Servo.h>
-#include <SoftwareSerial.h>
 #include "Util.h"
 
 #define NUM_INPUTS 3
-
-SoftwareSerial HC12(24, 26); // HC-12 TX Pin, HC-12 RX Pin
 
 bool tentacle_on = false;
 
@@ -26,11 +23,12 @@ int *inputs[NUM_INPUTS] = {voice_pins, hit_pins, root_pins};
 int input_values[NUM_INPUTS] = {0, 0, 0};            // Will be a binary number calculated from the input pins
 int input_pin_count[NUM_INPUTS] = {4, 4, 3};
 int input_counts[NUM_INPUTS] = {0, 0, 0};
-char input_names[NUM_INPUTS][4] = {"DENV", "DENH", "ROOT", "DYNM"};
+char input_names[4] = {'V', 'H', 'R', 'D'};
 String friendly_input_names[NUM_INPUTS] = {"voice", "hits", "root"};
 
 void setup() {
   Serial.begin(9600);
+  Serial1.begin(9600);
   Serial.println("Booting Doig...");
 
   for (int i = 0; i < NUM_INPUTS; i++) {
@@ -99,13 +97,13 @@ void checkInputs() {
     // Value has changed since the last check
     if (count != input_counts[i]) {
       Serial.print("changed sensor ");
-      Serial.print(input_names[i]);
+      Serial.print(friendly_input_names[i]);
       Serial.print(": ");
       Serial.println(binary_value);
       //Serial.println(input_counts[i]);
       inputHaptic(count, input_pin_count[i], i);
       input_counts[i] = count;
-      sendToServer(i, input_counts[i]);
+      sendToServer(i, binary_value);
     }
   }
 
@@ -113,14 +111,10 @@ void checkInputs() {
 }
 
 void sendToServer(int which, int val) {
-  HC12.write('d');
-  HC12.write(' ');
-  for (int i = 0; i < 4; i++) {
-    HC12.write(input_names[which][i]);
-  }
-  HC12.write(' ');
-  HC12.write(val);
-  HC12.write('\n');
+  Serial1.write('D');
+  Serial1.write(input_names[which]);
+  Serial1.write(val + 65); // val max is 15
+  Serial1.write('\n');
 }
 
 void checkDyn() {
