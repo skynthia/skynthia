@@ -130,3 +130,5 @@ dist
 .pnp.*
 
 .vs/
+errorsLog.txt
+outputLog.txt
