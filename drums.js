@@ -1,19 +1,20 @@
 const drumconfig = require("./drumconfig.json");
+const util = require("./util");
 
 let DRUMS_ON = true;
 
 let voices = [];
 
-let density_of_hits;
-let density_of_voices;
-let dynamism;
-let root_voice;
+let density_of_hits     = 0;
+let density_of_voices   = 1;
+let dynamism            = 0;
+let root_voice          = 0;
 let next_voice_probs;
-let change_pattern = false;
-let change_voices = false;
-let change_all_voices = false;
-let turn_drums_on = false;
-let turn_drums_off = false;
+let change_pattern      = false;
+let change_voices       = false;
+let change_all_voices   = false;
+let turn_drums_on       = false;
+let turn_drums_off      = false;
 
 function arduinoIn(value) {
   let num_val = value.charCodeAt(2) - 65; // get the int
@@ -188,8 +189,15 @@ function setDrumsOn(value) {
 }
 
 function setDensityOfHits(value) {
+  let last_doh = density_of_hits;
   density_of_hits = value;
-  change_pattern = true;
+  if (last_doh === 0 && density_of_hits != 0) {
+    change_voices = true;
+    generatePattern();
+  }
+  else {
+    change_pattern = true;
+  }
 }
 
 function setDensityOfVoices(value) {

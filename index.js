@@ -25,7 +25,7 @@ SerialPort.list().then(function(ports){
   let found = false;
   ports.forEach(port => {
     // correct format for serial ports on Windows
-    if (port.path.match(/COM[0-9]+/)) {
+    if (port.path.match(/COM[0-9]+/) && !found) {
       found = true;
       util.log("Opening port " + port.path);
       serialport = new SerialPort({ path: port.path, baudRate: 9600 });
