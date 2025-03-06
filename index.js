@@ -1,23 +1,19 @@
 const osc = require("osc");
-const fs = require("fs");
 const { SerialPort, ReadlineParser } = require("serialport");
 const drums = require("./drums");
-
-const outputLog = fs.createWriteStream("./outputLog.txt");
-const errorsLog = fs.createWriteStream("./errorsLog.txt");
-const logger = new console.Console(outputLog, errorsLog);
+const util = require("./util");
 
 let clock = 0;
 
 const udpPort = new osc.UDPPort({
-    // My port
-    localAddress: "127.0.0.1",
-    localPort: 57121,
+  // My port
+  localAddress: "127.0.0.1",
+  localPort: 57121,
 
-    // SuperCollider's port
-    remoteAddress: "127.0.0.1",
-    remotePort: 57120,
-    metadata: true
+  // SuperCollider's port
+  remoteAddress: "127.0.0.1",
+  remotePort: 57120,
+  metadata: true
 });
 
 udpPort.open();
@@ -31,27 +27,27 @@ SerialPort.list().then(function(ports){
     // correct format for serial ports on Windows
     if (port.path.match(/COM[0-9]+/)) {
       found = true;
-      console.log("Opening port " + port.path);
-      logger.log("Opening port " + port.path);
+      util.log("Opening port " + port.path);
       serialport = new SerialPort({ path: port.path, baudRate: 9600 });
-      parser = new ReadlineParser()
-      serialport.pipe(parser)
-      parser.on('data', arduinoIn)
+      parser = new ReadlineParser();
+      serialport.pipe(parser);
+      parser.on('data', arduinoIn);
     }
   })
   if (!found) {
-    console.error("No valid port found");
-    logger.error("No valid port found");
+    util.error("No valid port found");
+    process.exit(1);
   }
 });
 
 function arduinoIn(value) {
+  util.log("Received message: " + value);
   switch (value[0]) {
-    case "d":
+    case "D":
       drums.arduinoIn(value);
       break;
     default:
-      console.error("No matching handler for Arduino message " + value)
+      util.error("No matching handler for Arduino message " + value)
   }
 }
 
@@ -64,7 +60,7 @@ function sendToSC(a) {
       "value": a
     }]
   }
-  console.log("Sending " + a);
+  util.log("Sending " + a);
   udpPort.send(msg);
 }
 

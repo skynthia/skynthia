@@ -16,25 +16,18 @@ let turn_drums_on = false;
 let turn_drums_off = false;
 
 function arduinoIn(value) {
-  value = value.split(" ");
-  let num_val = value[2].charCodeAt(0); // get the int
+  let num_val = value.charCodeAt(2) - 65; // get the int
   switch (value[1]) {
-    case "HARD":
-      hardStartStop(num_val);
-      break;
-    case "ONOF":
-      setDrumsOn(num_val);
-      break;
-    case "DENH":
+    case 'H':
       setDensityOfHits(num_val);
       break;
-    case "DENV":
+    case 'V':
       setDensityOfVoices(num_val);
       break;
-    case "DYNM":
+    case 'D':
       setDynamism(num_val);
       break;
-    case "ROOT":
+    case 'R':
       setRootVoice(num_val);
       break;
   }
@@ -134,7 +127,7 @@ function generateHits(voice) {
       tries++;
     }
   }
-  console.log("hits for " + voice + ": " + drum.hits.join(" "));
+  util.log("hits for " + voice + ": " + drum.hits.join(" "));
 }
 
 function generateVoices() {
@@ -161,7 +154,7 @@ function generateVoices() {
             }
             added_voice = true;
 
-            console.log("Adding voice: " + drumconfig[next_voice].name);
+            util.log("Adding voice: " + drumconfig[next_voice].name);
             break;
           }
         }
@@ -174,7 +167,7 @@ function generateVoices() {
     for (let i = 0; i < Math.abs(diff); i++) {
       let idx = Math.floor(Math.random() * (voices.length - 1)) + 1;
       
-      console.log("Removing voice: " + drumconfig[voices[idx]].name);
+      util.log("Removing voice: " + drumconfig[voices[idx]].name);
       voices.splice(idx, 1);
     }
   }
@@ -201,7 +194,7 @@ function setDensityOfHits(value) {
 
 function setDensityOfVoices(value) {
   if (value < 1 || value > 8) {
-    console.error("INVALID SET VOICES COMMAND");
+    util.error("Invalid set density of voices command");
   }
   
   density_of_voices = value;
@@ -222,48 +215,5 @@ function setRootVoice(value) {
   change_pattern = true;
   change_all_voices = true;
 }
-/*
-setRootVoice(0);
-setDensityOfHits(12);
-// todo: don't call generateHits in this function
-setDensityOfVoices(1);
-setDynamism(0.5);
-generatePattern(); // testing
-
-setTimeout(() => {
-  setDensityOfVoices(3);
-}, 4000);
-
-setTimeout(() => {
-  setDensityOfHits(3);
-}, 12000);
-
-setTimeout(() => {
-  setDensityOfVoices(2);
-}, 13000);
-
-setTimeout(() => {
-  setDensityOfVoices(6);
-}, 26000);
-
-setTimeout(() => {
-  setDensityOfHits(6);
-}, 42000);
-
-setTimeout(() => {
-  setDensityOfVoices(3);
-}, 63000);
-
-setTimeout(() => {
-  setDrumsOn(0);
-}, 80000);
-
-setTimeout(() => {
-  setDrumsOn(1);
-}, 84000);
-
-setTimeout(() => {
-  hardStartStop(false);
-}, 95000);*/
 
 module.exports = {arduinoIn, getHits};
