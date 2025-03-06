@@ -4,7 +4,7 @@ const outputLog = fs.createWriteStream("./outputLog.txt");
 const errorsLog = fs.createWriteStream("./errorsLog.txt");
 const logger = new console.Console(outputLog, errorsLog);
 
-function log() {
+function log(msg) {
   console.log(msg);
   logger.log(msg);
 }
