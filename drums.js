@@ -93,13 +93,13 @@ function generateHits(voice) {
   modifier = Math.random() > 0.5 ? modifier : -1 * modifier; // randomly + or -
   let num_hits = density_of_hits + modifier;
   num_hits = num_hits < 1 ? 1 : num_hits; // never less than 1
-  num_hits = num_hits > drum.max ? drum.max : num_hits; // never more than 16
+  num_hits = num_hits > drum.max ? drum.max : num_hits; // never more than max for this voice
 
   // TODO: Make this more efficient??
   for (let i = 0; i < num_hits; i++) {
     let found_hit = false;
     let tries = 0;
-    while (!found_hit && tries < 8) {
+    while (!found_hit && tries < drum.max) {
       for (let j = 0; j < probs.length; j++) {
         if (drum.equal_prob) {
           let note = Math.floor(Math.random() * 16);
@@ -111,7 +111,7 @@ function generateHits(voice) {
         }
         else {
           let rand = Math.random();
-          if (rand < probs[j].prob || tries === 7) {
+          if (rand < probs[j].prob || tries === drum.max - 1) {
             let idx = Math.floor(Math.random() * probs[j].notes.length);
             let hit = probs[j].notes[idx];
             drum.hits[hit] = true;
@@ -137,6 +137,7 @@ function generateVoices() {
   }
 
   let diff = density_of_voices - voices.length;
+  next_voice_probs = drumconfig[root_voice].voice_probs;
   // Adding voices
   if (diff > 0) {
     for (let i = 0; i < diff; i++) {
