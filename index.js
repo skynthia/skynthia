@@ -65,6 +65,11 @@ function sendToSC(a) {
 }
 
 function drumbeat() {
+  let status = drums.getStatus();
+  if (status) {
+    sendDrumStatus(status);
+  }
+  
   let hits = drums.getHits(clock % 16, clock % 64);
   clock++;
   // if drums are off or no hits
@@ -72,9 +77,9 @@ function drumbeat() {
     return;
   }
 
-  // add imperfections -- randomize by up to 10ms
+  // add imperfections -- randomize by up to 8ms
   for (let i = 0; i < hits.length; i++) {
-    setTimeout(() => { sendDrumHit(hits[i]) }, Math.random() * 10);
+    setTimeout(() => { sendDrumHit(hits[i]) }, Math.random() * 8);
   }
 }
 
@@ -89,6 +94,24 @@ function sendDrumHit(hit) {
     ]
   }
   udpPort.send(msg);
+}
+
+function sendDrumStatus(status) {
+  let msg = {
+    address: "/drum_status",
+    args: [
+      {
+        type: "i",
+        value: status.type
+      },
+      {
+        type: "i",
+        value: status.val
+      }
+    ]
+  }
+  udpPort.send(msg);
+
 }
 
 let metro = setInterval(drumbeat, 150); // TODO: allow to configure tempo

@@ -1,4 +1,5 @@
 const drumconfig = require("./drumconfig.json");
+const vibeconfig = require("./vibeconfig.json");
 const util = require("./util");
 
 let DRUMS_ON = true;
@@ -8,13 +9,16 @@ let voices = [];
 let density_of_hits     = 0;
 let density_of_voices   = 1;
 let dynamism            = 0;
-let root_voice          = 0;
-let next_voice_probs;
+let vibe                = vibeconfig[0];
+let root_voice          = vibe.root_voice;
+let next_voice_probs    = vibe.probs;
 let change_pattern      = false;
 let change_voices       = false;
 let change_all_voices   = false;
 let turn_drums_on       = false;
 let turn_drums_off      = false;
+
+let status = false;
 
 function arduinoIn(value) {
   let num_val = value.charCodeAt(2) - 65; // get the int
@@ -28,8 +32,11 @@ function arduinoIn(value) {
     case 'D':
       setDynamism(num_val);
       break;
-    case 'R':
-      setRootVoice(num_val);
+    case 'B':
+      setVibe(num_val);
+      break;
+    case 'F':
+      setFX(num_val);
       break;
   }
 }
@@ -137,7 +144,6 @@ function generateVoices() {
   }
 
   let diff = density_of_voices - voices.length;
-  next_voice_probs = drumconfig[root_voice].voice_probs;
   // Adding voices
   if (diff > 0) {
     for (let i = 0; i < diff; i++) {
@@ -216,13 +222,25 @@ function setDynamism(value) {
   change_pattern = true;
 }
 
-function setRootVoice(value) {
-  root_voice = value;
-  // Make a copy of the voice probs
-  let temp = drumconfig[root_voice].voice_probs; // just a separate var for visibility's sake
-  next_voice_probs = JSON.parse(JSON.stringify(temp));
+function setVibe(value) {
+  vibe = vibeconfig[value];
+  root_voice = vibe.root_voice;
+  next_voice_probs = vibe.probs;
+
   change_pattern = true;
+  change_voices = true;
   change_all_voices = true;
 }
 
-module.exports = {arduinoIn, getHits};
+function setFX(value) {
+
+}
+
+// TODO: only do this at the end of a bar/measure?
+function getStatus() {
+  let temp = status;
+  status = false;
+  return temp;
+}
+
+module.exports = {arduinoIn, getHits, getStatus};
