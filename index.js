@@ -66,7 +66,7 @@ function sendToSC(a) {
 
 function drumbeat() {
   let status = drums.getStatus();
-  if (status) {
+  if (status > -1) {
     sendDrumStatus(status);
   }
   

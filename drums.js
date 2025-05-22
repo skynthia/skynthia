@@ -18,7 +18,7 @@ let change_all_voices   = false;
 let turn_drums_on       = false;
 let turn_drums_off      = false;
 
-let status = false;
+let status = -1; // 0-7: status effects
 
 function arduinoIn(value) {
   let num_val = value.charCodeAt(2) - 65; // get the int
@@ -233,13 +233,16 @@ function setVibe(value) {
 }
 
 function setFX(value) {
-
+    status = {
+        type: 1,
+        val: value
+    };
 }
 
 // TODO: only do this at the end of a bar/measure?
 function getStatus() {
   let temp = status;
-  status = false;
+  status = -1;
   return temp;
 }
 

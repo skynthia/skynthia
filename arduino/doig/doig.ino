@@ -111,8 +111,20 @@ void checkInputs() {
 }
 
 void sendToServer(int which, int val) {
+  char input_name = input_names[which];
+  if (which == 0) {
+    // formerly known as voice, now vibe
+    if (val & 8) {
+      input_name = 'B';
+    }
+    else {
+      input_name = 'F';
+    }
+    val = val & 7;
+  }
+
   Serial1.write('D');
-  Serial1.write(input_names[which]);
+  Serial1.write(input_name);
   Serial1.write(val + 65); // val max is 15
   Serial1.write('\n');
 }
