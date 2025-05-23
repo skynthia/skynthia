@@ -114,7 +114,7 @@ void sendToServer(int which, int val) {
   char input_name = input_names[which];
   if (which == 0) {
     // formerly known as voice, now vibe
-    if (val & 8) {
+    if (val > 7) {
       input_name = 'B';
     }
     else {
