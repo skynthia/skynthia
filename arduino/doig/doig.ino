@@ -10,26 +10,27 @@ int fisting = 0;
 int fisting_new = 0;
 int fisting_pin = 53;
 
-int voice_pins[4] = {5, 4, 3, 2};
+int vibe_pins[4] = {5, 4, 3, 2};
 int hit_pins[4] = {8, 9, 10, 11};
-int root_pins[3] = {23, 25, 27};
+int voice_pins[3] = {23, 25, 27};
 int dyn_pins[2] = {A0, A1};
 int dyn_threshold = 900;
 int dyn_value = 0;
 int dyn_count_arr[2] = {0, 0};
 int dyn_count = 0;
 
-int *inputs[NUM_INPUTS] = {voice_pins, hit_pins, root_pins};
+int *inputs[NUM_INPUTS] = {vibe_pins, hit_pins, voice_pins};
 int input_values[NUM_INPUTS] = {0, 0, 0};            // Will be a binary number calculated from the input pins
 int input_pin_count[NUM_INPUTS] = {4, 4, 3};
 int input_counts[NUM_INPUTS] = {0, 0, 0};
-char input_names[4] = {'V', 'H', 'R', 'D'};
-String friendly_input_names[NUM_INPUTS] = {"voice", "hits", "root"};
+char input_names[4] = {'B', 'H', 'V', 'D'};
+String friendly_input_names[NUM_INPUTS] = {"vibe", "hits", "voice"};
 
 void setup() {
   Serial.begin(9600);
   Serial1.begin(9600);
   Serial.println("Booting Doig...");
+  Serial1.println("Booting Doig...");
 
   for (int i = 0; i < NUM_INPUTS; i++) {
     int *input_pins = inputs[i];
@@ -113,11 +114,8 @@ void checkInputs() {
 void sendToServer(int which, int val) {
   char input_name = input_names[which];
   if (which == 0) {
-    // formerly known as voice, now vibe
+    // formerly known as vibe, now vibe
     if (val > 7) {
-      input_name = 'B';
-    }
-    else {
       input_name = 'F';
     }
     val = val & 7;
