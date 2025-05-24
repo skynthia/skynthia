@@ -1,6 +1,10 @@
 TODO:
 
-Change root sensors to DoV
-Change DoV sensors to vibe + FX
+*Change root sensors to DoV
+*Change DoV sensors to vibe + FX
   1 pin: select programming vibe or FX
   3 pins: select between vibes/FX styles (vibes set in vibeconfix.json; FX styles set in SC)
+
+Add debugging info as an option from Serial
+Figure out a way to specify when I want dynamism to reset
+ > Maybe double flash one of the eyes?
