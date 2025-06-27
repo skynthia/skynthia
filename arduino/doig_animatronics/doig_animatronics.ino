@@ -41,6 +41,10 @@ int endstop_pins[3][2] = {
   {A2, A3},
   {A4, A5}
 };
+bool prev_endstop0_val[3] = {false, false, false};
+bool prev_endstop1_val[3] = {false, false, false};
+long endstop_trig[3];
+int endstop_timeout = 500;
 
 int motor_pins[3][2] = {
   // speed, direction
@@ -66,6 +70,8 @@ void setup() {
     pinMode(motor_pins[i][0], OUTPUT); // speed
     pinMode(motor_pins[i][1], OUTPUT); // direction
     digitalWrite(motor_pins[i][0], LOW);
+
+    endstop_trig[i] = millis();
   }
 
   pinMode(endstop_pins[0][0], INPUT_PULLUP);
@@ -80,22 +86,20 @@ void loop() {
     }
 
     // check end stops; sometimes flickers to 1 on the analog read
-    int endstop_val_0 = i == 0 ? digitalRead(endstop_pins[i][0]) : analogRead(endstop_pins[i][0]) <= 1;
-    bool endstop_val_1 = i == 0 ? digitalRead(endstop_pins[i][1]) : analogRead(endstop_pins[i][1]) > 1;
-    if (endstop_val_0 || endstop_val_1) {
+    bool endstop0_val = i == 0 ? digitalRead(endstop_pins[i][0]) : analogRead(endstop_pins[i][0]) > 0;
+    bool endstop1_val = i == 0 ? digitalRead(endstop_pins[i][1]) : analogRead(endstop_pins[i][1]) > 0;
+    //if (i == 1) Serial.println(endstop0_val);
+    if (((endstop0_val && !prev_endstop0_val[i])  || (endstop1_val && !prev_endstop1_val[i])) && (millis() - endstop_trig[i]) >= endstop_timeout) {
       Serial.print("Stopping motor ");
       Serial.println(i);
       newMove(i, true);
-      digitalWrite(13, HIGH);
+      endstop_trig[i] = millis();
     }
-    else {
-      digitalWrite(13, LOW);
-    }
-    
-    // move
+
+    prev_endstop0_val[i] = endstop0_val;
+    prev_endstop1_val[i] = endstop1_val;
   }
-  Serial.println();
-  delay(500);
+  delay(10);
 }
 
 void newMove(int which, bool end_stop) {
