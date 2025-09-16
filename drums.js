@@ -10,7 +10,7 @@ let density_of_hits     = 0;
 let density_of_voices   = 1;
 let dynamism            = 0;
 let vibe                = vibeconfig[0];
-let root_voice          = vibe.root_voice;
+let root_voice          = vibe.root;
 let next_voice_probs    = vibe.probs;
 let change_pattern      = false;
 let change_voices       = false;
@@ -27,7 +27,7 @@ function arduinoIn(value) {
       setDensityOfHits(num_val);
       break;
     case 'V':
-      setDensityOfVoices(num_val);
+      setDensityOfVoices(num_val + 1);
       break;
     case 'D':
       setDynamism(num_val);
