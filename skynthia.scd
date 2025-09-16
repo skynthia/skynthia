@@ -75,6 +75,11 @@ a.set(\pitch, 12);
 a.set(\noise, -0.2);
 a.free;
 
+a = SinOsc.ar(440, 0, 0.1);
+{a}.play;
+a.free;
+{ SinOsc.ar(200, 0, 0.5) }.play;
+
 
 s.quit;
 
