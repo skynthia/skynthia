@@ -36,7 +36,7 @@ SerialPort.list().then(function(ports){
   })
   if (!found) {
     util.error("No valid port found");
-    process.exit(1);
+    //process.exit(1);
   }
 });
 
@@ -115,3 +115,5 @@ function sendDrumStatus(status) {
 }
 
 let metro = setInterval(drumbeat, 150); // TODO: allow to configure tempo
+
+// arduinoIn('DHE'); // for testing

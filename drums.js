@@ -20,6 +20,9 @@ let turn_drums_off      = false;
 
 let status = -1; // 0-7: status effects
 
+let measures_since_change = 0;
+let change_target = 1;
+
 function arduinoIn(value) {
   let num_val = value.charCodeAt(2) - 65; // get the int
   switch (value[1]) {
@@ -43,18 +46,34 @@ function arduinoIn(value) {
 
 // beat is 0-15
 function getHits(beat, measure) {
-  if (change_pattern && beat === 0 && measure === 0) {
-    if (turn_drums_off) {
-      DRUMS_ON = false;
-      turn_drums_off = false;
+  if (beat === 0 && measure === 0) {
+    // chance of changing up drum pattern every four measures
+    if (measures_since_change % (4 * change_target) === 0) {
+      let r = Math.random();
+      util.log(r);
+      if (r < change_target / 8) {
+        change_pattern = true;
+        measures_since_change = -1; // TODO: this is stupid, better solution??
+        change_target = 0.5;
+      }
+      
+      change_target *= 2;
     }
-    else if (turn_drums_on) {
-      DRUMS_ON = true;
-      turn_drums_on = false; // currently DOES generate new pattern.
-    }
-    else {
-      // make a new pattern only at the end of a measure
-      generatePattern();
+    measures_since_change++;
+
+    if (change_pattern) {
+      if (turn_drums_off) {
+        DRUMS_ON = false;
+        turn_drums_off = false;
+      }
+      else if (turn_drums_on) {
+        DRUMS_ON = true;
+        turn_drums_on = false; // currently DOES generate new pattern.
+      }
+      else {
+        // make a new pattern only at the end of a measure
+        generatePattern();
+      }
     }
   }
 
