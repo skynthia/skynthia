@@ -3,8 +3,6 @@
 
 #define NUM_INPUTS 3
 
-bool tentacle_on = false;
-
 // inputs
 int fisting = 0;
 int fisting_new = 0;
@@ -13,18 +11,28 @@ int fisting_pin = 53;
 int vibe_pins[4] = {5, 4, 3, 2};
 int hit_pins[4] = {8, 9, 10, 11};
 int voice_pins[3] = {23, 25, 27};
-int dyn_pins[2] = {A0, A1};
-int dyn_threshold = 900;
-int dyn_value = 0;
-int dyn_count_arr[2] = {0, 0};
+
+int photo_threshold = 900;
+int dyn_pin = A0;
 int dyn_count = 0;
+int last_dyn_value = 0;
+bool dyn_changed = false;
+long dyn_start;
+
+int tempo_pin = A1;
+double tempo = 0;
+int last_tempo_value = 0;
+int tempo_diffs[4];
+int tempo_index = 0;
+bool tempo_changed = false;
+long tempo_start;
 
 int *inputs[NUM_INPUTS] = {vibe_pins, hit_pins, voice_pins};
 int input_values[NUM_INPUTS] = {0, 0, 0};            // Will be a binary number calculated from the input pins
 int input_pin_count[NUM_INPUTS] = {4, 4, 3};
 int input_counts[NUM_INPUTS] = {0, 0, 0};
-char input_names[4] = {'B', 'H', 'V', 'D'};
-String friendly_input_names[NUM_INPUTS] = {"vibe", "hits", "voice"};
+char input_names[5] = {'B', 'H', 'V', 'D', 'T'};
+String friendly_input_names[5] = {"vibe", "hits", "voice", "dynamism", "tempo"};
 
 void setup() {
   Serial.begin(9600);
@@ -40,19 +48,14 @@ void setup() {
   }
   
   setupHaptics();
+  dyn_start = tempo_start = millis();
   
   randomSeed(analogRead(A15));
-  setupTentacle();
 }
 
 void loop() {
   checkInputs();
   doHaptics();
-  
-  if (tentacle_on) {
-    loopTentacle();
-  }
-  delay(100);
 }
 
 void checkInputs() {
@@ -62,12 +65,22 @@ void checkInputs() {
   if (fisting_new != fisting && fisting_new) {
     Serial.println("Accepting sensor input");
     fistingHaptic();
-    dyn_value = 0; // always restart dynamism at 0 to make it work with input style
-    dyn_count_arr[0] = dyn_count_arr[1] = dyn_count = 0;
   }
   else if (fisting_new != fisting && !fisting_new) {
-    Serial.print("dynamism set to ");
-    Serial.println(dyn_value);
+    if (dyn_changed) {
+      Serial.print("dynamism set to ");
+      Serial.println(dyn_count);
+      dyn_changed = false;
+      dyn_count = 0;
+      sendToServer(3, dyn_count);
+    }
+    if (tempo_changed) {
+      Serial.print("tempo set to ");
+      Serial.println(tempo);
+      tempo_changed = false;
+      tempo_index = 0;
+      sendToServer(4, tempo);
+    }
   }
   
   fisting = fisting_new;
@@ -109,12 +122,13 @@ void checkInputs() {
   }
 
   checkDyn();
+  checkTempo();
 }
 
 void sendToServer(int which, int val) {
   char input_name = input_names[which];
   if (which == 0) {
-    // formerly known as vibe, now vibe
+    // formerly known as root_voice, now vibe
     if (val > 7) {
       input_name = 'F';
     }
@@ -128,19 +142,48 @@ void sendToServer(int which, int val) {
 }
 
 void checkDyn() {
-  for (int j = 0; j < 2; j++) {
-    int reading = analogRead(dyn_pins[j]);
-    if (reading >= dyn_threshold) {
-      dyn_value = dyn_value | (1 << j);
-      dyn_count_arr[j] = 1;
-    }
-    // this is so stupid
-    int count = dyn_count_arr[0] + dyn_count_arr[1];
-    
-    if (count != dyn_count) {
-      inputHaptic(count, 2, 3);
-      dyn_count = count;
-      sendToServer(3, dyn_count);
-    }
+  bool reading = analogRead(dyn_pin) >= photo_threshold;
+  // if this is newly over the threshold, AND it's been at least 50ms since the last such reading
+  if (reading != last_dyn_value && reading && millis() - dyn_start > 50) {
+    Serial.println("dynamism change detected");
+    dyn_changed = true; // Dynamism was changed
+    dyn_count++;
+    dyn_start = millis();
+    inputHaptic(dyn_count, 4, 3);
   }
+  
+  last_dyn_value = reading;
+}
+
+void checkTempo() {
+  bool reading = analogRead(tempo_pin) >= photo_threshold;
+  long ms = millis();
+  if (reading != last_tempo_value && reading && ms - tempo_start > 50) {
+    Serial.println("beat detected");
+    tempo_changed = true;
+    tempo_diffs[tempo_index] = ms - tempo_start;
+    tempo_start = ms;
+
+    if (tempo_index == 0) {
+      inputHaptic(1, 4, 5);
+    }
+    else if (tempo_index == 3) {
+      tempo = calculateTempo();
+      pulse_lengths[6][0] = tempo * 0.75;
+      pulse_lengths[6][1] = tempo * 0.25;
+      inputHaptic(4, 4, 6);
+    }
+
+    tempo_index = (tempo_index + 1) % 4; // mod 4 so in case this triggers more than 4 times we don't go out of bounds
+  }
+
+  last_tempo_value = reading;
+}
+
+double calculateTempo() {
+  double tempo_sum = 0.0;
+  for (int i = 0; i < 4; i++) {
+    tempo_sum += tempo_diffs[i];
+  }
+  return tempo_sum / 4.0;
 }

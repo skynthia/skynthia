@@ -1,15 +1,12 @@
+#include "Util.h"
+
 int haptic_pin = 52;
 
 int pulse_clock = 0;
 int pulse_count = 0;
 int pulse_total = 8;
 long ms;
-int pulse_lengths[4][2] = {
-  {200, 400},
-  {400, 200},
-  {100, 100},
-  {150, 50}
-};
+
 int pulse_length[2] = {300, 300};
 bool haptic_value = true;
 bool continue_haptics = false;
@@ -38,7 +35,7 @@ void inputHaptic(int count, int total_pins, int pulse_length_index) {
   pulse_count = count * 2; // multiply by two because of on and then off
   pulse_total = total_pins * 2;
   pulse_clock = 0;
-  continue_haptics = true;
+  //continue_haptics = true;
 }
 
 void stopHaptics() {
