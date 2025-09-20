@@ -258,7 +258,7 @@ function setFX(value) {
     };
 }
 
-// TODO: only do this at the end of a bar/measure?
+// this is only called at the end of a measure
 function getStatus() {
   let temp = status;
   status = -1;
