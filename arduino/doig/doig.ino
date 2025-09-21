@@ -1,4 +1,3 @@
-#include <Servo.h>
 #include "Util.h"
 
 #define NUM_INPUTS 3
@@ -17,7 +16,7 @@ int dyn_pin = A0;
 int dyn_count = 0;
 int last_dyn_value = 0;
 bool dyn_changed = false;
-long dyn_start;
+unsigned long dyn_start;
 
 int tempo_pin = A1;
 double tempo = 0;
@@ -25,7 +24,7 @@ int last_tempo_value = 0;
 int tempo_diffs[4];
 int tempo_index = 0;
 bool tempo_changed = false;
-long tempo_start;
+unsigned long tempo_start;
 
 int *inputs[NUM_INPUTS] = {vibe_pins, hit_pins, voice_pins};
 int input_values[NUM_INPUTS] = {0, 0, 0};            // Will be a binary number calculated from the input pins
@@ -33,6 +32,8 @@ int input_pin_count[NUM_INPUTS] = {4, 4, 3};
 int input_counts[NUM_INPUTS] = {0, 0, 0};
 char input_names[5] = {'B', 'H', 'V', 'D', 'T'};
 String friendly_input_names[5] = {"vibe", "hits", "voice", "dynamism", "tempo"};
+
+unsigned long ping_clock;
 
 void setup() {
   Serial.begin(9600);
@@ -48,14 +49,25 @@ void setup() {
   }
   
   setupHaptics();
-  dyn_start = tempo_start = millis();
+  dyn_start = tempo_start = ping_clock = millis();
   
   randomSeed(analogRead(A15));
 }
 
 void loop() {
+  checkPing();
   checkInputs();
   doHaptics();
+}
+
+void checkPing() {
+  // ping every 5 seconds  
+  if (millis() - ping_clock >= 5000) {
+    Serial1.write('P');
+    Serial1.write(0);
+    Serial1.write('\n');
+    ping_clock = millis();
+  }
 }
 
 void checkInputs() {

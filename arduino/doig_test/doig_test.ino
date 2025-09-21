@@ -1,21 +1,28 @@
-int count = 1;
+unsigned long clock;
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
+  Serial1.begin(9600);
+  clock = 0;
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  Serial.print("DH");
-  Serial.println((char) ((count % 16) + 65));
+  checkPing();
+}
 
-  if (count % 4 == 0) {
-    Serial.print("DV");
-    Serial.println((char) (((count / 4) % 4) + 66));
+void checkPing() {
+  if (millis() - clock > 5000) {
+    
+    Serial1.write('P');
+    Serial1.write('0');
+    Serial1.write('\n');
+    Serial.println("P0");
+    //Serial1.print("P0");
+    clock = millis();
+    digitalWrite(13, HIGH);
   }
-  
-  count++;
-  
-  delay(10000);
+  else if (millis() - clock > 500) {
+    digitalWrite(13, LOW);
+  }
 }
