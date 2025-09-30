@@ -2,7 +2,8 @@ const drumconfig = require("./drumconfig.json");
 const vibeconfig = require("./vibeconfig.json");
 const util = require("./util");
 
-let DRUMS_ON = true;
+let DRUMS_ON = false;
+let drums_turned_on = false;
 
 let voices = [];
 
@@ -46,14 +47,16 @@ function arduinoIn(value) {
 
 // beat is 0-15
 function getHits(beat, measure) {
+  drums_turned_on = false;
+
   if (beat === 0 && measure === 0) {
     // chance of changing up drum pattern every four measures
-    if (measures_since_change % (4 * change_target) === 0) {
+    if (measures_since_change % (2 * change_target) === 0) {
       let r = Math.random();
       util.log(r);
       if (r < change_target / 8) {
         change_pattern = true;
-        measures_since_change = -1; // TODO: this is stupid, better solution??
+        measures_since_change = -1;
         change_target = 0.5;
       }
       
@@ -217,9 +220,14 @@ function setDrumsOn(value) {
 function setDensityOfHits(value) {
   let last_doh = density_of_hits;
   density_of_hits = value;
-  if (last_doh === 0 && density_of_hits != 0) {
+  if (last_doh === 0 && density_of_hits !== 0) {
+    drums_turned_on = true;
+    DRUMS_ON = true;
     change_voices = true;
     generatePattern();
+  }
+  else if (last_doh !== 0 && density_of_hits === 0) {
+    DRUMS_ON = false;
   }
   else {
     change_pattern = true;
@@ -265,4 +273,14 @@ function getStatus() {
   return temp;
 }
 
-module.exports = {arduinoIn, getHits, getStatus};
+function getDrumsOn() {
+  if (drums_turned_on) {
+    return 2;
+  }
+  if (DRUMS_ON) {
+    return 1;
+  }
+  return 0;
+}
+
+module.exports = { arduinoIn, getHits, getStatus, getDrumsOn };

@@ -65,9 +65,20 @@ function sendToSC(a) {
 }
 
 function drumbeat() {
+  // If we're starting over, restart the clock
+  if (drums.getDrumsOn() === 2) {
+    clock = 0;
+  }
+
+  // If we're off, just return
+  if (!drums.getDrumsOn()) {
+    return;
+  }
+
+  // Otherwise calculate hits
   if (clock % 64 === 0) {
     let status = drums.getStatus();
-    if (status > -1) {
+    if (status !== -1) {
       sendDrumStatus(status);
     }
   }
@@ -118,4 +129,8 @@ function sendDrumStatus(status) {
 
 let metro = setInterval(drumbeat, 150); // TODO: allow to configure tempo
 
-// arduinoIn('DHE'); // for testing
+arduinoIn('DFB')
+arduinoIn('DVD');
+arduinoIn('DHJ'); // for testing
+
+setTimeout(() => { arduinoIn('DFA') }, 10000);

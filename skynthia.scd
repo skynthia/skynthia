@@ -18,16 +18,23 @@ s.boot;
 ~d09 = Buffer.read(s, thisProcess.nowExecutingPath.dirname +/+ "samples/drums/09_clop.wav");
 ~d10 = Buffer.read(s, thisProcess.nowExecutingPath.dirname +/+ "samples/drums/10_gong.wav");
 ~drums = [~d00, ~d01, ~d02, ~d03, ~d04, ~d05, ~d06, ~d07, ~d08, ~d09, ~d10];
+
+~drum_chan = 3;
 )
 
 (
 f = { |msg, time, addr|
 	if (msg[0] == '/drum_hit') {
+    //msg.postln;
     for(1, msg.size - 1) {
       | i |
-      Synth(\drum, [\out, 0, \drum, ~drums[msg[i]]]);
+      Synth(\drum, [\out, ~drum_chan, \drum, ~drums[msg[i]]]);
     }
-	}
+	};
+  if (msg[0] == '/drum_status') {
+    ~drum_chan = 3 + msg[2];
+    ~drum_chan.postln;
+  };
 };
 thisProcess.addOSCRecvFunc(f);
 );
@@ -60,13 +67,32 @@ SynthDef(\ahh, {| out = 0, b1 = 0, b2 = 0, pitch = 0, gate = 0, noise = 1, noise
 }).add;
 
 SynthDef(\drum, {
-  | out = 0, drum |
+  | out, drum |
   var pb1;
   pb1 = PlayBuf.ar(2, drum, doneAction: Done.freeSelf);
   Out.ar(out, pb1);
 }).add;
 
+SynthDef(\fx1, {
+  var in, fx;
+  in = In.ar(5);
+  fx = Decimator.ar(in, 4000, 3);
+  Out.ar(3, fx);
+}).add;
+
+SynthDef(\drum_out, {
+  Out.ar(0, Pan2.ar(In.ar(3) * 0.2));
+}).add;
+
 )
+
+~fx1 = Synth(\fx1);
+~fx1.free;
+~drum_out = Synth(\drum_out);
+~drum_out.free;
+
+
+Synth(\drum, [\out, 3, \drum, ~drums[2]]);
 
 a = Synth(\ahh, [\out, 0, \b1, ~ahh1, \b2, ~ahh2]);
 a.set(\gate, 1);
