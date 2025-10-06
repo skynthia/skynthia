@@ -27,6 +27,8 @@ s.doWhenBooted({
           };
           thisProcess.addOSCRecvFunc(f);
           "Setup OSC receiver".postln;
+
+          b = NetAddr.new("127.0.0.1", 57121);
         },
 
         1, {
@@ -125,6 +127,7 @@ s.doWhenBooted({
           }
           }.fork();
           "Finished setting up SuperCollider".postln;
+          b.sendMsg("/sc_fin", 1);
         }
       );
       // Wait a second between each step to give it time to process

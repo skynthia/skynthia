@@ -19,14 +19,14 @@ const udpPort = new osc.UDPPort({
 udpPort.open();
 
 let serialport;
+let sp_connected = false;
 let parser;
 
 SerialPort.list().then(function(ports){
-  let found = false;
   ports.forEach(port => {
     // correct format for serial ports on Windows
-    if (port.path.match(/COM[0-9]+/) && !found) {
-      found = true;
+    if (port.path.match(/COM[0-9]+/) && !sp_connected) {
+      sp_connected = true;
       util.log("Opening port " + port.path);
       serialport = new SerialPort({ path: port.path, baudRate: 9600 });
       parser = new ReadlineParser();
@@ -34,7 +34,7 @@ SerialPort.list().then(function(ports){
       parser.on('data', arduinoIn);
     }
   })
-  if (!found) {
+  if (!sp_connected) {
     util.error("No valid port found");
     //process.exit(1);
   }
@@ -127,6 +127,13 @@ function sendDrumStatus(status) {
 
 }
 
+udpPort.on("message", function (oscMsg) {
+  console.log(oscMsg.address + ": " + oscMsg.args[0].value);
+  if (sp_connected) {
+    serialport.write("SC" + oscMsg.args[0].value);
+  }
+});
+
 let metro = setInterval(drumbeat, 150); // TODO: allow to configure tempo
 
 arduinoIn('DFB')
@@ -134,3 +141,4 @@ arduinoIn('DVD');
 arduinoIn('DHJ'); // for testing
 
 setTimeout(() => { arduinoIn('DFA') }, 10000);
+
