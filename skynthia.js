@@ -45,10 +45,23 @@ function arduinoIn(value) {
   switch (value[0]) {
     case "D":
       drums.arduinoIn(value);
+      if (value[1] === 'T') {
+        setTempo(value);
+      }
       break;
     default:
       util.error("No matching handler for Arduino message " + value)
   }
+}
+
+function setTempo(value) {
+  let tempo = Number(value.substr(2));
+  if (isNaN(tempo)) {
+    error("Tempo is NAN");
+    return;
+  }
+  clearInterval(metro);
+  metro = setInterval(drumbeat, tempo);
 }
 
 function sendToSC(a) {
@@ -65,6 +78,16 @@ function sendToSC(a) {
 }
 
 function drumbeat() {
+  let status = drums.getStatus();
+  if (status !== -1) {
+    sendDrumStatus(status);
+  }
+
+  let sample = drums.getSample();
+  if (sample !== -1) {
+    sendSample(sample);
+  }
+
   // If we're starting over, restart the clock
   if (drums.getDrumsOn() === 2) {
     clock = 0;
@@ -76,13 +99,6 @@ function drumbeat() {
   }
 
   // Otherwise calculate hits
-  if (clock % 64 === 0) {
-    let status = drums.getStatus();
-    if (status !== -1) {
-      sendDrumStatus(status);
-    }
-  }
-  
   let hits = drums.getHits(clock % 16, clock % 64);
   clock++;
   // if drums are off or no hits
@@ -127,6 +143,23 @@ function sendDrumStatus(status) {
 
 }
 
+function sendSample(sample) {
+  let msg = {
+    address: "/sample",
+    args: [
+      {
+        type: "i",
+        value: sample.track
+      },
+      {
+        type: "i",
+        value: sample.val
+      }
+    ]
+  }
+  udpPort.send(msg);
+}
+
 udpPort.on("message", function (oscMsg) {
   console.log(oscMsg.address + ": " + oscMsg.args[0].value);
   if (sp_connected && oscMsg.args[0].value === 1) {
@@ -136,9 +169,10 @@ udpPort.on("message", function (oscMsg) {
 
 let metro = setInterval(drumbeat, 150); // TODO: allow to configure tempo
 
-arduinoIn('DFB')
+/*arduinoIn('DFB')
 arduinoIn('DVD');
-arduinoIn('DHJ'); // for testing
+arduinoIn('DHJ'); // for testing*/
+//arduinoIn('DVC');
 
-setTimeout(() => { arduinoIn('DFA') }, 10000);
-
+//setTimeout(() => { arduinoIn('DDA') }, 20000);
+//setTimeout(() => { arduinoIn('DHJ') }, 1000);

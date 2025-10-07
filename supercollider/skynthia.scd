@@ -13,6 +13,7 @@ s.doWhenBooted({
           o.memSize = 32768;
 
           f = { |msg, time, addr|
+            //msg.postln;
             if (msg[0] == '/drum_hit') {
               //msg.postln;
               for(1, msg.size - 1) {
@@ -20,9 +21,13 @@ s.doWhenBooted({
                 Synth(\drum, [\fx, ~drum_fx, \drum, ~drums[msg[i]]]);
               }
             };
-            if (msg[0] == '/drum_status') {
+            if (msg[0] == '/drum_status' && msg[1] == 1) {
               ~drum_fx = 3 + (msg[2] * 2);
               ~drum_fx.postln;
+            };
+            if (msg[0] == '/sample') {
+              //msg.postln;
+              Synth(\samp, [\sample, ~samples[msg[1]][msg[2]]]);
             };
           };
           thisProcess.addOSCRecvFunc(f);
@@ -52,11 +57,11 @@ s.doWhenBooted({
           ];
           ~drum_fx = 3;
 
-          ~samples = //[
-          [ // track 0
-            Buffer.read(s, thisProcess.nowExecutingPath.dirname ++ "/samples/samples/00_backing.wav")
+          ~samples = [
+            [ // track 0
+              Buffer.read(s, thisProcess.nowExecutingPath.dirname ++ "/samples/samples/00_backing.mp3")
+            ]
           ];
-          //];
 
           "Imported samples".postln;
         },
@@ -137,8 +142,8 @@ s.doWhenBooted({
 });
 
 
-Synth(\drum, [\fx, 7, \drum, ~drums[0]]);
-Synth(\samp, [\sample, ~samples[0]]);
+Synth(\drum, [\fx, 3, \drum, ~drums[0]]);
+Synth(\samp, [\sample, ~samples[0][0]]);
 
 
 /*

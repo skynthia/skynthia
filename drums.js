@@ -9,7 +9,7 @@ let voices = [];
 
 let density_of_hits     = 0;
 let density_of_voices   = 1;
-let dynamism            = 0;
+let dynamism            = 1; // since we can't use dynamism right now, set it to 1
 let vibe                = vibeconfig[0];
 let root_voice          = vibe.root;
 let next_voice_probs    = vibe.probs;
@@ -20,6 +20,7 @@ let turn_drums_on       = false;
 let turn_drums_off      = false;
 
 let status = -1; // 0-7: status effects
+let sample = -1; // TEMP
 
 let measures_since_change = 0;
 let change_target = 1;
@@ -34,7 +35,8 @@ function arduinoIn(value) {
       setDensityOfVoices(num_val + 1);
       break;
     case 'D':
-      setDynamism(num_val);
+      setSample(num_val);
+      //setDynamism(num_val);
       break;
     case 'B':
       setVibe(num_val);
@@ -244,6 +246,13 @@ function setDensityOfVoices(value) {
   change_pattern = true;
 }
 
+function setSample(value) {
+  sample = {
+    track: vibe.root,
+    val: value
+  }
+}
+
 function setDynamism(value) {
   dynamism = value;
   change_pattern = true;
@@ -260,16 +269,22 @@ function setVibe(value) {
 }
 
 function setFX(value) {
-    status = {
-        type: 1,
-        val: value
-    };
+  status = {
+    type: 1,
+    val: value
+  };
 }
 
 // this is only called at the end of a measure
 function getStatus() {
   let temp = status;
   status = -1;
+  return temp;
+}
+
+function getSample() {
+  let temp = sample;
+  sample = -1;
   return temp;
 }
 
@@ -283,4 +298,4 @@ function getDrumsOn() {
   return 0;
 }
 
-module.exports = { arduinoIn, getHits, getStatus, getDrumsOn };
+module.exports = { arduinoIn, getHits, getStatus, getSample, getDrumsOn };
