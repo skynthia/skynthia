@@ -129,8 +129,8 @@ function sendDrumStatus(status) {
 
 udpPort.on("message", function (oscMsg) {
   console.log(oscMsg.address + ": " + oscMsg.args[0].value);
-  if (sp_connected) {
-    serialport.write("SC" + oscMsg.args[0].value);
+  if (sp_connected && oscMsg.args[0].value === 1) {
+    serialport.write("SC1");
   }
 });
 
