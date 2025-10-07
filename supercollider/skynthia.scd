@@ -141,12 +141,10 @@ s.doWhenBooted({
   }.fork();
 });
 
-
+/*
 Synth(\drum, [\fx, 3, \drum, ~drums[0]]);
 Synth(\samp, [\sample, ~samples[0][0]]);
 
-
-/*
 ~fx1.free;
 ~fx1 = Synth(\fx1);
 

@@ -167,7 +167,7 @@ udpPort.on("message", function (oscMsg) {
   }
 });
 
-let metro = setInterval(drumbeat, 150); // TODO: allow to configure tempo
+let metro = setInterval(drumbeat, 150);
 
 /*arduinoIn('DFB')
 arduinoIn('DVD');
