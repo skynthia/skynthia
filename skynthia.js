@@ -1,6 +1,7 @@
 const osc = require("osc");
 const { SerialPort, ReadlineParser } = require("serialport");
 const drums = require("./drums");
+const melody = require("./melody");
 const util = require("./util");
 
 let clock = 0;
@@ -61,7 +62,7 @@ function setTempo(value) {
     return;
   }
   clearInterval(metro);
-  metro = setInterval(drumbeat, tempo);
+  metro = setInterval(beat, tempo);
 }
 
 function sendToSC(a) {
@@ -77,15 +78,17 @@ function sendToSC(a) {
   udpPort.send(msg);
 }
 
+
+function beat() {
+  drumbeat();
+  melodybeat();
+  samplebeat();
+}
+
 function drumbeat() {
   let status = drums.getStatus();
   if (status !== -1) {
     sendDrumStatus(status);
-  }
-
-  let sample = drums.getSample();
-  if (sample !== -1) {
-    sendSample(sample);
   }
 
   // If we're starting over, restart the clock
@@ -106,9 +109,23 @@ function drumbeat() {
     return;
   }
 
-  // add imperfections -- randomize by up to 8ms
+  // add imperfections -- randomize by up to 4ms
   for (let i = 0; i < hits.length; i++) {
-    setTimeout(() => { sendDrumHit(hits[i]) }, Math.random() * 8);
+    setTimeout(() => { sendDrumHit(hits[i]) }, Math.random() * 4);
+  }
+}
+
+function melodybeat() {
+  let note = melody.getNote();
+  if (note !== -1) {
+    sendNote(note);
+  }
+}
+
+function samplebeat() {
+  let sample = drums.getSample();
+  if (sample !== -1) {
+    sendSample(sample);
   }
 }
 
@@ -143,6 +160,19 @@ function sendDrumStatus(status) {
 
 }
 
+function sendNote(note) {
+  let msg = {
+    address: "/note",
+    args: [
+      {
+        type: "i",
+        value: note
+      }
+    ]
+  }
+  udpPort.send(msg)
+}
+
 function sendSample(sample) {
   let msg = {
     address: "/sample",
@@ -167,7 +197,7 @@ udpPort.on("message", function (oscMsg) {
   }
 });
 
-let metro = setInterval(drumbeat, 150);
+let metro = setInterval(beat, 150);
 
 /*arduinoIn('DFB')
 arduinoIn('DVD');

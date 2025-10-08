@@ -67,6 +67,41 @@ s.doWhenBooted({
         },
 
         2, {
+          /* THIS IS AWESOME
+          SynthDef("test2", {
+            | out=0, amp=1 |
+            var micinput = SoundIn.ar(0) * 10;
+            var carrier =  PlayBuf.ar(2, ~ahh1);
+            var sig1 = amp*Vocoder.ar(
+              carrier, // synth (carrier)
+              micinput, // mic (modulator)
+              num:128, low:100, high:7500, q:0.03);
+            var sig2 = HPF.ar(HPF.ar(micinput, 5000), 5000);
+            Out.ar([0, 1],sig1+sig2);
+          }).add;
+
+          Synth("test2", [\amp, 3 /*careful!*/, \out, 0]); */
+
+          SynthDef(\drum, {
+            | fx, drum |
+            var pb1;
+            pb1 = PlayBuf.ar(2, drum, doneAction: Done.freeSelf)*0.5;
+
+            Out.ar(fx, pb1);
+          }).add;
+
+          SynthDef(\fx1, {
+            Out.ar(3, Decimator.ar(In.ar(5), 4000, 4));
+          }).add;
+
+          SynthDef(\fx2, {
+            Out.ar(3, Disintegrator.ar(Decimator.ar(In.ar(7), 1500, 2), 0.9, 0.7));
+          }).add;
+
+          SynthDef(\drums_out, {
+            Out.ar(0, Pan2.ar(In.ar(3), 0.1));
+          }).add;
+
           SynthDef(\ahh, {| out = 0, b1 = 0, b2 = 0, pitch = 0, gate = 0, noise = 1, noise2 = 0.5 |
             var sig, pb1, pb2, ln, chaos;
             ln = LFNoise2.ar(0.1, 0.5, 0.5);
@@ -95,26 +130,6 @@ s.doWhenBooted({
           SynthDef(\samp, {
             | sample |
             Out.ar(0, Limiter.ar(PlayBuf.ar(2, sample, doneAction: Done.freeSelf)));
-          }).add;
-
-          SynthDef(\drum, {
-            | fx, drum |
-            var pb1;
-            pb1 = PlayBuf.ar(2, drum, doneAction: Done.freeSelf)*0.5;
-
-            Out.ar(fx, pb1);
-          }).add;
-
-          SynthDef(\fx1, {
-            Out.ar(3, Decimator.ar(In.ar(5), 4000, 4));
-          }).add;
-
-          SynthDef(\fx2, {
-            Out.ar(3, Disintegrator.ar(Decimator.ar(In.ar(7), 1500, 2), 0.9, 0.7));
-          }).add;
-
-          SynthDef(\drums_out, {
-            Out.ar(0, Pan2.ar(In.ar(3), 0.1));
           }).add;
 
           "Setup SynthDefs".postln;
@@ -158,13 +173,6 @@ Synth(\drum, [\fx, 3, \drum, ~drums[0]]);
 Synth(\samp, [\sample, ~samples[0]]);
 
 
-a = Synth(\ahh, [\out, 0, \b1, ~ahh1, \b2, ~ahh2]);
-a.set(\gate, 1);
-a.set(\gate, 0);
-a.set(\pitch, 12);
-a.set(\noise, -0.2);
-a.free;
-
 a = SinOsc.ar(440, 0, 0.1);
 {a}.play;
 a.free;
@@ -174,24 +182,37 @@ a.free;
 thisProcess.removeOSCRecvFunc(f);
 // s.quit;
 
+
+
+
+
+
+
+
+
+
+
+a = Synth(\ahh, [\out, 0, \b1, ~ahh1, \b2, ~ahh2]);
+a.set(\gate, 1);
+a.set(\gate, 0);
+a.set(\noise, 1);
+a.free;
+
+~tones = [ 0, 2, 3, 5, 7, 8, 10, 12 ];
+
+(
+{
+  (0..4).do {
+    |i|
+    a.set(\pitch, ~tones[i * 2]);
+    1.wait;
+  }
+}.fork();
+
+)
+
+
 */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
