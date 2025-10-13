@@ -82,6 +82,19 @@ s.doWhenBooted({
 
           Synth("test2", [\amp, 3 /*careful!*/, \out, 0]); */
 
+          SynthDef(\vfx0, {
+            Out.ar(0, Pan2.ar(CombN.ar(SoundIn.ar(0!2) * -5.dbamp, 0.5, 0.5, 0.001)!2));
+          }).add;
+
+          SynthDef(\vfx1, {
+            |voice|
+            voice = CombN.ar(SoundIn.ar(0!2) * -5.dbamp, 0.5, 0.5, 0.001);
+            Out.ar(0, PitShift.ar(
+              in: voice,
+              shift: 0.8
+            ));
+          }).add;
+
           SynthDef(\drum, {
             | fx, drum |
             var pb1;
@@ -146,6 +159,8 @@ s.doWhenBooted({
             0.125.wait;
           }
           }.fork();
+
+          ~vox = Synth(\vfx_0);
           "Finished setting up SuperCollider".postln;
           b.sendMsg("/sc_fin", 1);
         }
