@@ -160,7 +160,7 @@ s.doWhenBooted({
           }
           }.fork();
 
-          ~vox = Synth(\vfx_0);
+          ~vox = Synth(\vfx0);
           "Finished setting up SuperCollider".postln;
           b.sendMsg("/sc_fin", 1);
         }

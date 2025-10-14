@@ -1,3 +1,4 @@
+const os = require('node:os');
 const osc = require("osc");
 const { SerialPort, ReadlineParser } = require("serialport");
 const drums = require("./drums");
@@ -26,7 +27,11 @@ let parser;
 SerialPort.list().then(function(ports){
   ports.forEach(port => {
     // correct format for serial ports on Windows
-    if (port.path.match(/COM[0-9]+/) && !sp_connected) {
+    if (port.path.match(
+        os.platform() === "linux" ? 
+          /\/dev\/ttyACM[0-9]+/ :
+          /COM[0-9]+/
+      ) && !sp_connected) {
       sp_connected = true;
       util.log("Opening port " + port.path);
       serialport = new SerialPort({ path: port.path, baudRate: 9600 });

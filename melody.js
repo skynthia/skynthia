@@ -19,4 +19,4 @@ function generateMelody() {
 
 }
 
-modules.exports = { getNote };
+module.exports = { getNote };
