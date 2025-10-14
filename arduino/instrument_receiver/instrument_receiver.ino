@@ -1,13 +1,14 @@
 #include <SoftwareSerial.h>
 #include <FastLED.h>
 #define PIN       2
-#define NUM_LEDS  3
+#define NUM_LEDS  4
 
 SoftwareSerial HC12(10, 11); // HC-12 TX Pin, HC-12 RX Pin
 CRGB leds[NUM_LEDS];
 
 byte read_byte;
 String read_buffer = "";
+String read_from_node = "";
 int pinged[3] = {0, 0, 0};
 
 unsigned long led_clock;
@@ -45,6 +46,14 @@ void checkSerialInput() {
     }
     else {
       read_buffer += (char) read_byte;
+    }
+  }
+
+  while (Serial.available()) {
+    read_from_node += Serial.read();
+    if (read_from_node == "SC1") {
+      leds[3] = CRGB(0, 255, 0);
+      read_from_node = "";
     }
   }
 }

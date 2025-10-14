@@ -91,7 +91,7 @@ void checkInputs() {
       Serial.println(tempo);
       tempo_changed = false;
       tempo_index = 0;
-      sendToServer(4, tempo);
+      sendToServer(4, Math.round(tempo/4)); // divide by 4 to get sixteenth notes
     }
   }
   
