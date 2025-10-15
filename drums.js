@@ -260,7 +260,7 @@ function setDynamism(value) {
 
 function setVibe(value) {
   vibe = vibeconfig[value];
-  root_voice = vibe.root_voice;
+  root_voice = vibe.root;
   next_voice_probs = vibe.probs;
 
   change_pattern = true;
