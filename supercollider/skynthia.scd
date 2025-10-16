@@ -18,12 +18,13 @@ s.doWhenBooted({
               //msg.postln;
               for(1, msg.size - 1) {
                 | i |
-                Synth(\drum, [\fx, ~drum_fx, \drum, ~drums[msg[i]]]);
+                Synth(\drum, [\fx, ~drum_fx_bus, \drum, ~drums[msg[i]]]);
               }
             };
             if (msg[0] == '/drum_status' && msg[1] == 1) {
-              ~drum_fx = 3 + (msg[2] * 2);
-              ~drum_fx.postln;
+              msg.postln;
+              ~drum_fx_bus = ~drum_fx_busses[msg[2]];
+              ~drum_fx_bus.postln;
             };
             if (msg[0] == '/sample') {
               //msg.postln;
@@ -55,13 +56,15 @@ s.doWhenBooted({
             Buffer.read(s, thisProcess.nowExecutingPath.dirname ++ "/samples/drums/09_clop.wav"),
             Buffer.read(s, thisProcess.nowExecutingPath.dirname ++ "/samples/drums/10_gong.wav")
           ];
-          ~drum_fx = 3;
 
           ~samples = [
             [ // track 0
               Buffer.read(s, thisProcess.nowExecutingPath.dirname ++ "/samples/samples/00_backing.mp3")
             ]
           ];
+
+          ~drum_fx_busses = [Bus.audio(s, 2), Bus.audio(s, 2), Bus.audio(s, 2)];
+          ~drum_fx_bus = ~drum_fx_busses[0];
 
           "Imported samples".postln;
         },
@@ -80,7 +83,7 @@ s.doWhenBooted({
             Out.ar([0, 1],sig1+sig2);
           }).add;
 
-          Synth("test2", [\amp, 3 /*careful!*/, \out, 0]); */
+          Synth("test2", [\amp, 3 /*careful!*/, \out, 0]);*/
 
           SynthDef(\vfx0, {
             Out.ar(0, Pan2.ar(CombN.ar(SoundIn.ar(0!2) * -5.dbamp, 0.5, 0.5, 0.001)!2));
@@ -104,15 +107,15 @@ s.doWhenBooted({
           }).add;
 
           SynthDef(\fx1, {
-            Out.ar(3, Decimator.ar(In.ar(5), 4000, 4));
+            Out.ar(~drum_fx_busses[0].index, Decimator.ar(In.ar(~drum_fx_busses[1].index), 4000, 4));
           }).add;
 
           SynthDef(\fx2, {
-            Out.ar(3, Disintegrator.ar(Decimator.ar(In.ar(7), 1500, 2), 0.9, 0.7));
+            Out.ar(~drum_fx_busses[0].index, Disintegrator.ar(Decimator.ar(In.ar(~drum_fx_busses[2].index), 1500, 2), 0.9, 0.7));
           }).add;
 
           SynthDef(\drums_out, {
-            Out.ar(0, Pan2.ar(In.ar(3), 0.1));
+            Out.ar(0, Pan2.ar(In.ar(~drum_fx_busses[0].index), 0.1));
           }).add;
 
           SynthDef(\ahh, {| out = 0, b1 = 0, b2 = 0, pitch = 0, gate = 0, noise = 1, noise2 = 0.5 |
@@ -166,7 +169,7 @@ s.doWhenBooted({
         }
       );
       // Wait a second between each step to give it time to process
-      1.wait;
+      2.wait;
     }
   }.fork();
 });
@@ -200,7 +203,7 @@ thisProcess.removeOSCRecvFunc(f);
 
 
 
-
+~drum_fx_bus.index.postln;
 
 
 

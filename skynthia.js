@@ -47,16 +47,20 @@ SerialPort.list().then(function(ports){
 });
 
 function arduinoIn(value) {
-  util.log("Received message: " + value);
   switch (value[0]) {
     case "D":
+      util.log("Received message from Doig: " + value);
       drums.arduinoIn(value);
       if (value[1] === 'T') {
         setTempo(value);
       }
       break;
+    case "P":
+      break;
     default:
-      util.error("No matching handler for Arduino message " + value)
+      util.log("Received message: " + value);
+      break;
+      //util.error("No matching handler for Arduino message " + value)
   }
 }
 
@@ -198,11 +202,21 @@ function sendSample(sample) {
 udpPort.on("message", function (oscMsg) {
   console.log(oscMsg.address + ": " + oscMsg.args[0].value);
   if (sp_connected && oscMsg.args[0].value === 1) {
-    serialport.write("SC1");
+    serialport.write("SC1\n");
   }
 });
 
 let metro = setInterval(beat, 150);
+
+/*setTimeout(() => { 
+  serialport.write("SC1\n", function(err) {
+  if (err) {
+    return console.log('Error on write: ', err.message)
+  }
+  console.log('message written')
+})
+
+}, 2000);*/
 
 /*arduinoIn('DFB')
 arduinoIn('DVD');
