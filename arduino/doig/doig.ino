@@ -86,7 +86,7 @@ void checkInputs() {
       dyn_count = 0;
       sendToServer(3, dyn_count);
     }
-    if (tempo_changed) {
+    if (tempo_changed && tempo_index >= 4) {
       Serial.print("tempo set to ");
       Serial.println(tempo);
       tempo_changed = false;
@@ -173,7 +173,7 @@ void checkTempo() {
   if (reading != last_tempo_value && reading && ms - tempo_start > 50) {
     Serial.println("beat detected");
     tempo_changed = true;
-    tempo_diffs[tempo_index] = ms - tempo_start;
+    tempo_diffs[tempo_index % 4] = ms - tempo_start;  // mod 4 so in case this triggers more than 4 times we don't go out of bounds
     tempo_start = ms;
 
     if (tempo_index == 0) {
@@ -186,7 +186,7 @@ void checkTempo() {
       inputHaptic(4, 4, 6);
     }
 
-    tempo_index = (tempo_index + 1) % 4; // mod 4 so in case this triggers more than 4 times we don't go out of bounds
+    tempo_index++;
   }
 
   last_tempo_value = reading;
