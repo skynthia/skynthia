@@ -71,13 +71,8 @@
 			},
 			{
 				"prob": 0.5,
-				"voices": [ 2, 3, 8, 9, 10 ],
-				"voice_names": [ "low_stab", "high_stab", "ding", "clop", "gong" ]
-			},
-			{
-				"prob": 0.1,
-				"voices": [ 1 ],
-				"voice_names": [ "long_kick" ]
+				"voices": [ 6, 1, 8, 9, 10 ],
+				"voice_names": [ "low_oontz", "long_kick", "ding", "gong" ]
 			}
 		]
 	}

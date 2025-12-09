@@ -10,11 +10,11 @@ let clock = 0;
 const udpPort = new osc.UDPPort({
   // My port
   localAddress: "127.0.0.1",
-  localPort: 57121,
+  localPort: 666,
 
   // SuperCollider's port
   remoteAddress: "127.0.0.1",
-  remotePort: 57120,
+  remotePort: 667,
   metadata: true
 });
 
@@ -144,7 +144,7 @@ function sendDrumHit(hit) {
     args: [
       {
         type: "i",
-        value: hit
+        value: hit + 60
       }
     ]
   }
@@ -206,7 +206,7 @@ udpPort.on("message", function (oscMsg) {
   }
 });
 
-let metro = setInterval(beat, 150);
+let metro = setInterval(beat, 180);
 
 /*setTimeout(() => { 
   serialport.write("SC1\n", function(err) {
@@ -218,9 +218,10 @@ let metro = setInterval(beat, 150);
 
 }, 2000);*/
 
-/*arduinoIn('DFB')
+arduinoIn('DBD')
+arduinoIn('DFB')
 arduinoIn('DVD');
-arduinoIn('DHJ'); // for testing*/
+arduinoIn('DHJ'); // for testing
 //arduinoIn('DVC');
 
 //setTimeout(() => { arduinoIn('DDA') }, 20000);
