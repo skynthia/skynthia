@@ -10,11 +10,11 @@ let clock = 0;
 const udpPort = new osc.UDPPort({
   // My port
   localAddress: "127.0.0.1",
-  localPort: 666,
+  localPort: 667,
 
   // SuperCollider's port
   remoteAddress: "127.0.0.1",
-  remotePort: 667,
+  remotePort: 666,
   metadata: true
 });
 
@@ -95,9 +95,9 @@ function beat() {
 }
 
 function drumbeat() {
-  let status = drums.getStatus();
-  if (status !== -1) {
-    sendDrumStatus(status);
+  let effects = drums.getEffects();
+  if (effects !== -1) {
+    sendDrumEffects(effects);
   }
 
   // If we're starting over, restart the clock
@@ -151,17 +151,13 @@ function sendDrumHit(hit) {
   udpPort.send(msg);
 }
 
-function sendDrumStatus(status) {
+function sendDrumEffects(effects) {
   let msg = {
-    address: "/drum_status",
+    address: "/drum_effects",
     args: [
       {
         type: "i",
-        value: status.type
-      },
-      {
-        type: "i",
-        value: status.val
+        value: effects
       }
     ]
   }
@@ -183,16 +179,21 @@ function sendNote(note) {
 }
 
 function sendSample(sample) {
+  if (sample > 60) {
+    log("Attempted to send sample with value > 60");
+    return;
+  }
+
   let msg = {
     address: "/sample",
     args: [
-      {
+      /*{
         type: "i",
         value: sample.track
-      },
+      },*/
       {
         type: "i",
-        value: sample.val
+        value: sample
       }
     ]
   }
@@ -218,10 +219,16 @@ let metro = setInterval(beat, 180);
 
 }, 2000);*/
 
-arduinoIn('DBD')
-arduinoIn('DFB')
-arduinoIn('DVD');
-arduinoIn('DHJ'); // for testing
+//arduinoIn('DBD')
+sendSample(0);
+setTimeout(() => {
+  arduinoIn('DFB')
+  setTimeout(() => { arduinoIn('DFC') }, 5000);
+  setTimeout(() => { arduinoIn('DFD') }, 10000);
+  setTimeout(() => { arduinoIn('DFA') }, 15000);
+  arduinoIn('DVD');
+  arduinoIn('DHF'); // for testing
+}, 15000);
 //arduinoIn('DVC');
 
 //setTimeout(() => { arduinoIn('DDA') }, 20000);

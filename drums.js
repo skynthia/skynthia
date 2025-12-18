@@ -19,7 +19,7 @@ let change_all_voices   = false;
 let turn_drums_on       = false;
 let turn_drums_off      = false;
 
-let status = -1; // 0-7: status effects
+let effects = -1; // 0-7: effects
 let sample = -1; // TEMP
 
 let measures_since_change = 0;
@@ -42,7 +42,7 @@ function arduinoIn(value) {
       setVibe(num_val);
       break;
     case 'F':
-      setFX(num_val);
+      setEffects(num_val);
       break;
   }
 }
@@ -247,10 +247,8 @@ function setDensityOfVoices(value) {
 }
 
 function setSample(value) {
-  sample = {
-    track: vibe.root,
-    val: value
-  }
+  // 12 samples per track CURRENTLY (octave)
+  sample = (vibe.root * 12) + value;
 }
 
 function setDynamism(value) {
@@ -268,17 +266,14 @@ function setVibe(value) {
   change_all_voices = true;
 }
 
-function setFX(value) {
-  status = {
-    type: 1,
-    val: value
-  };
+function setEffects(value) {
+  effects = value;
 }
 
 // this is only called at the end of a measure
-function getStatus() {
-  let temp = status;
-  status = -1;
+function getEffects() {
+  let temp = effects;
+  effects = -1;
   return temp;
 }
 
@@ -298,4 +293,4 @@ function getDrumsOn() {
   return 0;
 }
 
-module.exports = { arduinoIn, getHits, getStatus, getSample, getDrumsOn };
+module.exports = { arduinoIn, getHits, getEffects, getSample, getDrumsOn };
