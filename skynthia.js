@@ -217,7 +217,7 @@ let metro = setInterval(beat, 180);
   console.log('message written')
 })
 
-}, 2000);*/
+}, 2000);
 
 //arduinoIn('DBD')
 sendSample(0);
@@ -232,4 +232,4 @@ setTimeout(() => {
 //arduinoIn('DVC');
 
 //setTimeout(() => { arduinoIn('DDA') }, 20000);
-//setTimeout(() => { arduinoIn('DHJ') }, 1000);
+//setTimeout(() => { arduinoIn('DHJ') }, 1000);*/
