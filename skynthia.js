@@ -225,7 +225,7 @@ let metro = setInterval(beat, 180);
 }, 2000);
 
 arduinoIn('DBD')
-arduinoIn('DVF')
+arduinoIn('DVC')
 arduinoIn('DHG')
 
 /*

@@ -61,18 +61,18 @@
 		"probs": [
 			{
 				"prob": 0.8,
-				"voices": [ 14, 1 ],
-				"voice_names": [ "dance_snare", "long_kick" ]
+				"voices": [ 6, 7 ],
+				"voice_names": [ "low_oontz", "high_oontz" ]
 			},
 			{
 				"prob": 0.6,
-				"voices": [ 15 ],
-				"voice_names": [ "extra_low" ]
+				"voices": [ 5, 15, 16 ],
+				"voice_names": [ "open_hat", "extra_low", "low_buzz" ]
 			},
 			{
 				"prob": 0.5,
-				"voices": [ 6, 8, 11, 12, 5 ],
-				"voice_names": [ "low_oontz", "ding", "merp", "screech", "open_hat" ]
+				"voices": [ 11, 12, 17, 18, 14 ],
+				"voice_names": [ "merp", "screech", "mid_buzz", "high_buzz", "dance_snare" ]
 			}
 		]
 	}

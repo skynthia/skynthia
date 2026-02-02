@@ -329,7 +329,7 @@
     ],
     "equal_prob": true,
     "probs": ["equal"],
-    "max": 6
+    "max": 4
   },
 
 
@@ -429,5 +429,56 @@
       }
     ],
     "max": 16
+  },
+
+
+
+
+
+  {
+    "name": "lowbuzz",
+    "hits": [
+      false, false, false, false, 
+      false, false, false, false, 
+      false, false, false, false, 
+      false, false, false, false
+    ],
+    "equal_prob": true,
+    "probs": ["equal"],
+    "max": 8
+  },
+
+
+
+
+
+  {
+    "name": "midbuzz",
+    "hits": [
+      false, false, false, false, 
+      false, false, false, false, 
+      false, false, false, false, 
+      false, false, false, false
+    ],
+    "equal_prob": true,
+    "probs": ["equal"],
+    "max": 6
+  },
+
+
+
+
+
+  {
+    "name": "highbuzz",
+    "hits": [
+      false, false, false, false, 
+      false, false, false, false, 
+      false, false, false, false, 
+      false, false, false, false
+    ],
+    "equal_prob": true,
+    "probs": ["equal"],
+    "max": 4
   }
 ]
