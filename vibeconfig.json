@@ -32,8 +32,8 @@
 			},
 			{
 				"prob": 0.2,
-				"voices": [ 8, 9, 10 ],
-				"voice_names": [ "ding", "clop", "gong" ]
+				"voices": [ 9 ],
+				"voice_names": [ "clop" ]
 			}
 		]
 	},
@@ -57,22 +57,22 @@
 
 	{
 		"name": "dance",
-		"root": 6,
+		"root": 13,
 		"probs": [
 			{
-				"prob": 0.9,
-				"voices": [ 7 ],
-				"voice_names": [ "high_oontz" ]
+				"prob": 0.8,
+				"voices": [ 14 ],
+				"voice_names": [ "dance_snare" ]
 			},
 			{
-				"prob": 0.7,
-				"voices": [ 0 ],
-				"voice_names": [ "kick" ]
+				"prob": 0.6,
+				"voices": [ 15 ],
+				"voice_names": [ "extra_low" ]
 			},
 			{
 				"prob": 0.5,
-				"voices": [ 6, 1, 8, 9, 10 ],
-				"voice_names": [ "low_oontz", "long_kick", "ding", "gong" ]
+				"voices": [ 6, 8, 11, 12 ],
+				"voice_names": [ "low_oontz", "ding", "merp", "screech" ]
 			}
 		]
 	}
