@@ -61,8 +61,8 @@
 		"probs": [
 			{
 				"prob": 0.8,
-				"voices": [ 14 ],
-				"voice_names": [ "dance_snare" ]
+				"voices": [ 14, 1 ],
+				"voice_names": [ "dance_snare", "long_kick" ]
 			},
 			{
 				"prob": 0.6,
@@ -71,8 +71,8 @@
 			},
 			{
 				"prob": 0.5,
-				"voices": [ 6, 8, 11, 12 ],
-				"voice_names": [ "low_oontz", "ding", "merp", "screech" ]
+				"voices": [ 6, 8, 11, 12, 5 ],
+				"voice_names": [ "low_oontz", "ding", "merp", "screech", "open_hat" ]
 			}
 		]
 	}

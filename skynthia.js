@@ -224,8 +224,12 @@ let metro = setInterval(beat, 180);
 
 }, 2000);
 
-//arduinoIn('DBD')
-sendSample(0);
+arduinoIn('DBD')
+arduinoIn('DVF')
+arduinoIn('DHG')
+
+/*
+//sendSample(0);
 setTimeout(() => {
   arduinoIn('DFB')
   setTimeout(() => { arduinoIn('DFC') }, 5000);
