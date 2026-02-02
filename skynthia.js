@@ -70,6 +70,11 @@ function setTempo(value) {
     error("Tempo is NAN");
     return;
   }
+  else if (tempo < 50) {
+    error("tempo too low, I don't believe this");
+    return;
+  }
+  tempo = Math.round(tempo / 4);
   clearInterval(metro);
   metro = setInterval(beat, tempo);
 }
