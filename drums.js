@@ -159,7 +159,7 @@ function generateHits(voice) {
       tries++;
     }
   }
-  util.log("hits for " + voice + ": " + drum.hits.join(" "));
+  util.log("hits for " + drum.name + ": " + drum.hits.join(" "));
 }
 
 function generateVoices() {

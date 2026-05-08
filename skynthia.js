@@ -70,8 +70,8 @@ function setTempo(value) {
     error("Tempo is NAN");
     return;
   }
-  else if (tempo < 50) {
-    error("tempo too low, I don't believe this");
+  else if (tempo < 50 || tempo > 5000) {
+    error("tempo too low/high, I don't believe this");
     return;
   }
   tempo = Math.round(tempo / 4);
@@ -222,10 +222,10 @@ let metro = setInterval(beat, 180);
   console.log('message written')
 })
 
-}, 2000);
+}, 2000);*/
 
 arduinoIn('DBD')
-arduinoIn('DVC')
+arduinoIn('DVD')
 arduinoIn('DHG')
 
 /*
