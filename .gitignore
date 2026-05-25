@@ -132,3 +132,8 @@ dist
 .vs/
 errorsLog.txt
 outputLog.txt
+*.asd
+ableton/backing Project/backing_1.wav
+
+# Ableton stuff
+ableton/skynthia Project/Backup/

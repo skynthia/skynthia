@@ -1,28 +1,19 @@
-unsigned long clock;
+bool done = false;
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
   Serial1.begin(9600);
-  clock = 0;
+  delay(1000);
 }
 
 void loop() {
-  checkPing();
-}
-
-void checkPing() {
-  if (millis() - clock > 5000) {
-    
-    Serial1.write('P');
-    Serial1.write('0');
-    Serial1.write('\n');
-    Serial.println("P0");
-    //Serial1.print("P0");
-    clock = millis();
-    digitalWrite(13, HIGH);
-  }
-  else if (millis() - clock > 500) {
-    digitalWrite(13, LOW);
+  if (!done){
+    Serial1.print("AT+P8");
+    delay(200);
+    while (HC12.available()) {           // If HC-12 has data (the AT Command response)
+      Serial.write(HC12.read());         // Send the data to Serial monitor
+    }
+    done = true;
   }
 }

@@ -1,13 +1,14 @@
 #include <SoftwareSerial.h>
 #include <FastLED.h>
 #define PIN       2
-#define NUM_LEDS  3
+#define NUM_LEDS  6
 
 SoftwareSerial HC12(10, 11); // HC-12 TX Pin, HC-12 RX Pin
 CRGB leds[NUM_LEDS];
 
 byte read_byte;
 String read_buffer = "";
+String read_from_node = "";
 int pinged[3] = {0, 0, 0};
 
 unsigned long led_clock;
@@ -17,8 +18,12 @@ void setup() {
   HC12.begin(9600);
   
   FastLED.addLeds<WS2812, PIN, GRB>(leds, NUM_LEDS).setRgbw(RgbwDefault());
-  FastLED.setBrightness(128);  // Set global brightness to 50%
+  FastLED.setBrightness(64);
   led_clock = millis();
+  
+  leds[3] = CRGB(255, 0,0);
+  leds[4] = CRGB(255, 0,0);
+  leds[5] = CRGB(255, 0,0);
 }
 
 void loop() {
@@ -47,6 +52,17 @@ void checkSerialInput() {
     }
     else {
       read_buffer += (char) read_byte;
+    }
+  }
+
+  while (Serial.available()) {
+    char c = (char)Serial.read();
+    read_from_node += c;
+    if (read_from_node == "SC1") {
+      leds[3] = CRGB(255, 255, 255);
+      leds[4] = CRGB(255, 255, 255);
+      leds[5] = CRGB(255, 255, 255);
+      read_from_node = "";
     }
   }
 }

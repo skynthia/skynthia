@@ -85,7 +85,7 @@ void checkInputs() {
       dyn_count = 0;
       sendToServer(3, dyn_count);
     }
-    if (tempo_changed) {
+    if (tempo_changed && tempo_index >= 4) {
       Serial.print("tempo set to ");
       Serial.println(tempo);
       tempo_changed = false;

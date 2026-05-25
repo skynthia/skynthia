@@ -1,6 +1,4 @@
 TODO:
 Add debugging info as an option from Serial
 
-Add handshake with RX module and visual feedback for message sent to RX from each instrument
-
 Setup and test bidirectional communication with motor Arduino

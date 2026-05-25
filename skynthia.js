@@ -1,6 +1,8 @@
+const os = require('node:os');
 const osc = require("osc");
 const { SerialPort, ReadlineParser } = require("serialport");
 const drums = require("./drums");
+const melody = require("./melody");
 const util = require("./util");
 
 let clock = 0;
@@ -8,25 +10,29 @@ let clock = 0;
 const udpPort = new osc.UDPPort({
   // My port
   localAddress: "127.0.0.1",
-  localPort: 57121,
+  localPort: 667,
 
   // SuperCollider's port
   remoteAddress: "127.0.0.1",
-  remotePort: 57120,
+  remotePort: 666,
   metadata: true
 });
 
 udpPort.open();
 
 let serialport;
+let sp_connected = false;
 let parser;
 
 SerialPort.list().then(function(ports){
-  let found = false;
   ports.forEach(port => {
     // correct format for serial ports on Windows
-    if (port.path.match(/COM[0-9]+/) && !found) {
-      found = true;
+    if (port.path.match(
+        os.platform() === "linux" ? 
+          /\/dev\/ttyACM[0-9]+/ :
+          /COM[0-9]+/
+      ) && !sp_connected) {
+      sp_connected = true;
       util.log("Opening port " + port.path);
       serialport = new SerialPort({ path: port.path, baudRate: 9600 });
       parser = new ReadlineParser();
@@ -34,16 +40,16 @@ SerialPort.list().then(function(ports){
       parser.on('data', arduinoIn);
     }
   })
-  if (!found) {
+  if (!sp_connected) {
     util.error("No valid port found");
     //process.exit(1);
   }
 });
 
 function arduinoIn(value) {
-  util.log("Received message: " + value);
   switch (value[0]) {
     case "D":
+      util.log("Received message from Doig: " + value);
       if (value[1] === "T") {
         setTempo(value);
       }
@@ -51,9 +57,28 @@ function arduinoIn(value) {
         drums.arduinoIn(value);
       }
       break;
+    case "P":
+      break;
     default:
-      util.error("No matching handler for Arduino message " + value)
+      util.log("Received message: " + value);
+      break;
+      //util.error("No matching handler for Arduino message " + value)
   }
+}
+
+function setTempo(value) {
+  let tempo = Number(value.substr(2));
+  if (isNaN(tempo)) {
+    error("Tempo is NAN");
+    return;
+  }
+  else if (tempo < 50 || tempo > 5000) {
+    error("tempo too low/high, I don't believe this");
+    return;
+  }
+  tempo = Math.round(tempo / 4);
+  clearInterval(metro);
+  metro = setInterval(beat, tempo);
 }
 
 function sendToSC(a) {
@@ -69,14 +94,30 @@ function sendToSC(a) {
   udpPort.send(msg);
 }
 
+
+function beat() {
+  drumbeat();
+  melodybeat();
+  samplebeat();
+}
+
 function drumbeat() {
-  if (clock % 64 === 0) {
-    let status = drums.getStatus();
-    if (status > -1) {
-      sendDrumStatus(status);
-    }
+  let effects = drums.getEffects();
+  if (effects !== -1) {
+    sendDrumEffects(effects);
   }
-  
+
+  // If we're starting over, restart the clock
+  if (drums.getDrumsOn() === 2) {
+    clock = 0;
+  }
+
+  // If we're off, just return
+  if (!drums.getDrumsOn()) {
+    return;
+  }
+
+  // Otherwise calculate hits
   let hits = drums.getHits(clock % 16, clock % 64);
   clock++;
   // if drums are off or no hits
@@ -84,9 +125,23 @@ function drumbeat() {
     return;
   }
 
-  // add imperfections -- randomize by up to 8ms
+  // add imperfections -- randomize by up to 4ms
   for (let i = 0; i < hits.length; i++) {
-    setTimeout(() => { sendDrumHit(hits[i]) }, Math.random() * 8);
+    setTimeout(() => { sendDrumHit(hits[i]) }, Math.random() * 4);
+  }
+}
+
+function melodybeat() {
+  let note = melody.getNote();
+  if (note !== -1) {
+    sendNote(note);
+  }
+}
+
+function samplebeat() {
+  let sample = drums.getSample();
+  if (sample !== -1) {
+    sendSample(sample);
   }
 }
 
@@ -96,24 +151,20 @@ function sendDrumHit(hit) {
     args: [
       {
         type: "i",
-        value: hit
+        value: hit + 60
       }
     ]
   }
   udpPort.send(msg);
 }
 
-function sendDrumStatus(status) {
+function sendDrumEffects(effects) {
   let msg = {
-    address: "/drum_status",
+    address: "/drum_effects",
     args: [
       {
         type: "i",
-        value: status.type
-      },
-      {
-        type: "i",
-        value: status.val
+        value: effects
       }
     ]
   }
@@ -121,17 +172,75 @@ function sendDrumStatus(status) {
 
 }
 
-function setTempo(value) {
-  let tempo = Number(value.substr(2));
-  if (tempo.isNaN()) {
-    error("Received tempo is NaN");
+function sendNote(note) {
+  let msg = {
+    address: "/note",
+    args: [
+      {
+        type: "i",
+        value: note
+      }
+    ]
+  }
+  udpPort.send(msg)
+}
+
+function sendSample(sample) {
+  if (sample > 60) {
+    log("Attempted to send sample with value > 60");
     return;
   }
 
-  clearInterval(metro);
-  metro = setInterval(drumbeat, tempo/4); // drum hit every 16th note
+  let msg = {
+    address: "/sample",
+    args: [
+      /*{
+        type: "i",
+        value: sample.track
+      },*/
+      {
+        type: "i",
+        value: sample
+      }
+    ]
+  }
+  udpPort.send(msg);
 }
 
-let metro = setInterval(drumbeat, 150);
+udpPort.on("message", function (oscMsg) {
+  console.log(oscMsg.address + ": " + oscMsg.args[0].value);
+  if (sp_connected && oscMsg.args[0].value === 1) {
+    serialport.write("SC1\n");
+  }
+});
 
-// arduinoIn('DHE'); // for testing
+let metro = setInterval(beat, 180);
+
+/*setTimeout(() => { 
+  serialport.write("SC1\n", function(err) {
+  if (err) {
+    return console.log('Error on write: ', err.message)
+  }
+  console.log('message written')
+})
+
+}, 2000);*/
+
+arduinoIn('DBD')
+arduinoIn('DVD')
+arduinoIn('DHG')
+
+/*
+//sendSample(0);
+setTimeout(() => {
+  arduinoIn('DFB')
+  setTimeout(() => { arduinoIn('DFC') }, 5000);
+  setTimeout(() => { arduinoIn('DFD') }, 10000);
+  setTimeout(() => { arduinoIn('DFA') }, 15000);
+  arduinoIn('DVD');
+  arduinoIn('DHF'); // for testing
+}, 15000);
+//arduinoIn('DVC');
+
+//setTimeout(() => { arduinoIn('DDA') }, 20000);
+//setTimeout(() => { arduinoIn('DHJ') }, 1000);*/

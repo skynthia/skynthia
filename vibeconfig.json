@@ -1,6 +1,6 @@
 [
 	{
-		"name": "default",
+		"name": "80kv",
 		"root": 0,
 		"probs": [
 			{
@@ -32,52 +32,42 @@
 			},
 			{
 				"prob": 0.2,
-				"voices": [ 8, 9, 10 ],
-				"voice_names": [ "ding", "clop", "gong" ]
+				"voices": [ 9 ],
+				"voice_names": [ "clop" ]
 			}
 		]
 	},
 
 	{
-		"name": "resonant",
-		"root": 1,
+		"name": "dance_0",
+		"root": 15,
+		"probs": [
+			{
+				"prob": 0.6,
+				"voices": [ 9, 11, 0, 7, 12, 14, 18 ],
+				"voice_names": [ "clop", "merp", "kick", "high_oontz", "screech", "dance_snare", "high_buzz" ]
+			}
+		]
+	},
+
+	{
+		"name": "dance_1",
+		"root": 13,
 		"probs": [
 			{
 				"prob": 0.8,
-				"voices": [ 8, 9, 10 ],
-				"voice_names": [ "ding", "clop", "gong" ]
+				"voices": [ 6, 7 ],
+				"voice_names": [ "low_oontz", "high_oontz" ]
 			},
 			{
-				"prob": 0.2,
-				"voices": [ 2, 3, 6, 7 ],
-				"voice_names": [ "low_stab", "high_stab", "low_oontz", "high_oontz" ]
-			}
-		]
-	},
-
-	{
-		"name": "dance",
-		"root": 6,
-		"probs": [
-			{
-				"prob": 0.9,
-				"voices": [ 7 ],
-				"voice_names": [ "high_oontz" ]
-			},
-			{
-				"prob": 0.7,
-				"voices": [ 0 ],
-				"voice_names": [ "kick" ]
+				"prob": 0.6,
+				"voices": [ 5, 15],
+				"voice_names": [ "open_hat", "extra_low" ]
 			},
 			{
 				"prob": 0.5,
-				"voices": [ 2, 3, 8, 9, 10 ],
-				"voice_names": [ "low_stab", "high_stab", "ding", "clop", "gong" ]
-			},
-			{
-				"prob": 0.1,
-				"voices": [ 1 ],
-				"voice_names":  ["long_kick"]
+				"voices": [ 11, 12, 18, 14, 16, 17 ],
+				"voice_names": [ "merp", "screech", "high_buzz", "dance_snare", "low_buzz", "mid_buzz" ]
 			}
 		]
 	}

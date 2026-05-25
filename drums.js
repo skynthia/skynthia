@@ -2,13 +2,14 @@ const drumconfig = require("./drumconfig.json");
 const vibeconfig = require("./vibeconfig.json");
 const util = require("./util");
 
-let DRUMS_ON = true;
+let DRUMS_ON = false;
+let drums_turned_on = false;
 
 let voices = [];
 
 let density_of_hits     = 0;
 let density_of_voices   = 1;
-let dynamism            = 0;
+let dynamism            = 1; // since we can't use dynamism right now, set it to 1
 let vibe                = vibeconfig[0];
 let root_voice          = vibe.root;
 let next_voice_probs    = vibe.probs;
@@ -18,7 +19,8 @@ let change_all_voices   = false;
 let turn_drums_on       = false;
 let turn_drums_off      = false;
 
-let status = -1; // 0-7: status effects
+let effects = -1; // 0-7: effects
+let sample = -1; // TEMP
 
 let measures_since_change = 0;
 let change_target = 1;
@@ -33,27 +35,30 @@ function arduinoIn(value) {
       setDensityOfVoices(num_val + 1);
       break;
     case 'D':
-      setDynamism(num_val);
+      setSample(num_val);
+      //setDynamism(num_val);
       break;
     case 'B':
       setVibe(num_val);
       break;
     case 'F':
-      setFX(num_val);
+      setEffects(num_val);
       break;
   }
 }
 
 // beat is 0-15
 function getHits(beat, measure) {
+  drums_turned_on = false;
+
   if (beat === 0 && measure === 0) {
     // chance of changing up drum pattern every four measures
-    if (measures_since_change % (4 * change_target) === 0) {
+    if (measures_since_change % (2 * change_target) === 0) {
       let r = Math.random();
       util.log(r);
       if (r < change_target / 8) {
         change_pattern = true;
-        measures_since_change = -1; // TODO: this is stupid, better solution??
+        measures_since_change = -1;
         change_target = 0.5;
       }
       
@@ -154,7 +159,7 @@ function generateHits(voice) {
       tries++;
     }
   }
-  util.log("hits for " + voice + ": " + drum.hits.join(" "));
+  util.log("hits for " + drum.name + ": " + drum.hits.join(" "));
 }
 
 function generateVoices() {
@@ -217,9 +222,14 @@ function setDrumsOn(value) {
 function setDensityOfHits(value) {
   let last_doh = density_of_hits;
   density_of_hits = value;
-  if (last_doh === 0 && density_of_hits != 0) {
+  if (last_doh === 0 && density_of_hits !== 0) {
+    drums_turned_on = true;
+    DRUMS_ON = true;
     change_voices = true;
     generatePattern();
+  }
+  else if (last_doh !== 0 && density_of_hits === 0) {
+    DRUMS_ON = false;
   }
   else {
     change_pattern = true;
@@ -236,6 +246,11 @@ function setDensityOfVoices(value) {
   change_pattern = true;
 }
 
+function setSample(value) {
+  // 12 samples per track CURRENTLY (octave)
+  sample = (vibe.root * 12) + value;
+}
+
 function setDynamism(value) {
   dynamism = value;
   change_pattern = true;
@@ -243,7 +258,7 @@ function setDynamism(value) {
 
 function setVibe(value) {
   vibe = vibeconfig[value];
-  root_voice = vibe.root_voice;
+  root_voice = vibe.root;
   next_voice_probs = vibe.probs;
 
   change_pattern = true;
@@ -251,18 +266,31 @@ function setVibe(value) {
   change_all_voices = true;
 }
 
-function setFX(value) {
-    status = {
-        type: 1,
-        val: value
-    };
+function setEffects(value) {
+  effects = value;
 }
 
 // this is only called at the end of a measure
-function getStatus() {
-  let temp = status;
-  status = -1;
+function getEffects() {
+  let temp = effects;
+  effects = -1;
   return temp;
 }
 
-module.exports = {arduinoIn, getHits, getStatus};
+function getSample() {
+  let temp = sample;
+  sample = -1;
+  return temp;
+}
+
+function getDrumsOn() {
+  if (drums_turned_on) {
+    return 2;
+  }
+  if (DRUMS_ON) {
+    return 1;
+  }
+  return 0;
+}
+
+module.exports = { arduinoIn, getHits, getEffects, getSample, getDrumsOn };
