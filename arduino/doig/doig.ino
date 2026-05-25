@@ -22,7 +22,7 @@ int tempo_pin = A1;
 double tempo = 0;
 int last_tempo_value = 0;
 int tempo_diffs[4];
-int tempo_index = 0;
+int tempo_index = -1;
 bool tempo_changed = false;
 unsigned long tempo_start;
 
@@ -39,7 +39,6 @@ void setup() {
   Serial.begin(9600);
   Serial1.begin(9600);
   Serial.println("Booting Doig...");
-  Serial1.println("Booting Doig...");
 
   for (int i = 0; i < NUM_INPUTS; i++) {
     int *input_pins = inputs[i];
@@ -90,8 +89,8 @@ void checkInputs() {
       Serial.print("tempo set to ");
       Serial.println(tempo);
       tempo_changed = false;
-      tempo_index = 0;
-      sendToServer(4, tempo);
+      tempo_index = -1;
+      sendTempoToServer(tempo);
     }
   }
   
@@ -173,7 +172,15 @@ void checkTempo() {
   if (reading != last_tempo_value && reading && ms - tempo_start > 50) {
     Serial.println("beat detected");
     tempo_changed = true;
-    tempo_diffs[tempo_index] = ms - tempo_start;
+
+    // First time just set the start point and return
+    if (tempo_index < 0) {
+      tempo_start = ms;
+      tempo_index++;
+      return;
+    }
+    
+    tempo_diffs[tempo_index % 4] = ms - tempo_start; // mod 4 in case there end up being more than five
     tempo_start = ms;
 
     if (tempo_index == 0) {
@@ -186,7 +193,7 @@ void checkTempo() {
       inputHaptic(4, 4, 6);
     }
 
-    tempo_index = (tempo_index + 1) % 4; // mod 4 so in case this triggers more than 4 times we don't go out of bounds
+    tempo_index++;
   }
 
   last_tempo_value = reading;
@@ -198,4 +205,12 @@ double calculateTempo() {
     tempo_sum += tempo_diffs[i];
   }
   return tempo_sum / 4.0;
+}
+
+void sendTempoToServer(float tempo) {
+  int tempo_int = round(tempo);
+  Serial1.write('D');
+  Serial1.write('T');
+  Serial1.print(String(tempo_int));
+  Serial1.write('\n');
 }

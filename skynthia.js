@@ -44,7 +44,12 @@ function arduinoIn(value) {
   util.log("Received message: " + value);
   switch (value[0]) {
     case "D":
-      drums.arduinoIn(value);
+      if (value[1] === "T") {
+        setTempo(value);
+      }
+      else {
+        drums.arduinoIn(value);
+      }
       break;
     default:
       util.error("No matching handler for Arduino message " + value)
@@ -116,6 +121,17 @@ function sendDrumStatus(status) {
 
 }
 
-let metro = setInterval(drumbeat, 150); // TODO: allow to configure tempo
+function setTempo(value) {
+  let tempo = Number(value.substr(2));
+  if (tempo.isNaN()) {
+    error("Received tempo is NaN");
+    return;
+  }
+
+  clearInterval(metro);
+  metro = setInterval(drumbeat, tempo/4); // drum hit every 16th note
+}
+
+let metro = setInterval(drumbeat, 150);
 
 // arduinoIn('DHE'); // for testing

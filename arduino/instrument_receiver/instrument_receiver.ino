@@ -23,7 +23,7 @@ void setup() {
 
 void loop() {
   checkSerialInput();
-  if (millis() - led_clock > 30) {
+  if (millis() - led_clock > 40) {
     updateLEDs();
     led_clock = millis();
   }
@@ -34,12 +34,14 @@ void loop() {
 void checkSerialInput() {
   while (HC12.available()) {
     read_byte = HC12.read();
-    Serial.write(read_byte);
+    //Serial.write(read_byte);
     if (read_byte == '\n') {
-      //Serial.println(read_buffer);
       if (read_buffer[0] == 'P') {
         pinged[atoi(read_buffer[1])] = 255;
         //Serial.println((String) "Pinged by " + read_buffer[1]);
+      }
+      else {
+        Serial.println(read_buffer);
       }
       read_buffer = "";
     }
@@ -52,7 +54,7 @@ void checkSerialInput() {
 void updateLEDs() {
   for (int i = 0; i < 3; i++) {
     if (pinged[i] > 0) {
-      pinged[i] --;
+      pinged[i] -= 2;
       leds[i] = CRGB(0, pinged[i], 0);
       
     }
