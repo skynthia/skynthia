@@ -20,6 +20,9 @@ int rtl_val = 0;
 int left_tentacle = 26;
 int lt_val = 0;
 
+int sample_num = 0;
+int change_sample = 0;
+
 int motor = 50;
 
 // photoresistors
@@ -57,6 +60,7 @@ void loop() {
   checkEyes();
   checkTentacles();
   checkTouch();
+  checkHaptics();
   delay(10);
 }
 
@@ -67,6 +71,8 @@ void checkEyes() {
     int eye_val = analogRead(eyes[i]);
     if ((eye_val - eye_calibration[i]) >= 200 && eye_active[i] == -1) {
       // do a buzz here so I can tell if this is happening
+      sendHaptics(250 + (250*i));
+      
       // does Samp need eyelids???
       Serial.print("Activate eye ");
       Serial.println(i);
@@ -75,6 +81,20 @@ void checkEyes() {
     else if ((eye_val - eye_calibration[i]) < 100 && eye_active[i] > -1) {
       Serial.print("Deactivate eye ");
       Serial.println(i);
+      if (millis() - eye_active[i] > 1000) {
+        sendHaptics(250 + (250*i));
+        if (i == 0) {
+          Serial.println("Next track");
+          sample_num = 0;
+          Serial1.println("PNT");
+        }
+        else {
+          Serial.print("Play/stop clip ");
+          Serial.println(rts_val);
+          Serial1.print("PC");
+          Serial1.println((char) (rts_val + 65));
+        }
+      }
       eye_active[i] = -1;
     }
   }
@@ -94,33 +114,49 @@ void checkTentacles() {
     rts_val = rts_new;
     Serial.print("New RTS val: ");
     Serial.println(rts_val);
+    sendHaptics(100 + (100*rts_val));
   }
   if (rtl_val != rtl_new) {
     rtl_val = rtl_new;
-    Serial.print("New RTL val: ");
+    Serial.print("Change vocal effects: ");
     Serial.println(rtl_val);
+    Serial1.print("PV");
+    Serial1.println((char) (rtl_val + 65));
+    sendHaptics(200 + (200*rts_val));
   }
 
   // left tentacle
   int lt_new = digitalRead(left_tentacle);
   if (lt_val != lt_new) {
     lt_val = lt_new;
-    if (lt_val) {
+    if (lt_val && lt_active == -1) {
       lt_active = millis();
+      sendHaptics(100);
     }
     else {
-      if (millis() - lt_active > 1000) {
-        // previous sample
+      if (change_sample == 0) {
+        Serial.println("Send current sample");
+        Serial1.print("PS");
+        Serial1.println((char) (sample_num + 65));
+        sendHaptics(100);
       }
       else {
-        Serial.println("Send current sample");
-        
+        sample_num += change_sample;
+        Serial.print("Change sample by ");
+        Serial.println(sample_num);
+        sendHaptics(300 + (sample_num * 100)));
       }
       lt_active = -1;
     }
-    
-    Serial.print("New LT val: ");
-    Serial.println(lt_val);
+  }
+
+  if (millis() - lt_active > 2000 && change_sample == 1) {
+    change_sample == -1;
+    sendHaptics(200);
+  }
+  else if (millis() - lt_active > 1000 && change_sample == 0) {
+    change_sample == 1;
+    sendHaptics(200);
   }
 }
 
@@ -130,6 +166,7 @@ void checkTouch() {
   for (uint8_t i=0; i<3; i++) {
     if ((currtouched & _BV(i)) && !(lasttouched & _BV(i)) ) {
       touched_count++;
+      sendHaptics(100);
     }
     if (!(currtouched & _BV(i)) && (lasttouched & _BV(i)) ) {
       touched_count--;
