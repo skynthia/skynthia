@@ -2,17 +2,23 @@ const os = require('node:os');
 const osc = require("osc");
 const { SerialPort, ReadlineParser } = require("serialport");
 const drums = require("./drums");
+const sampler = require("./sampler");
 const melody = require("./melody");
 const util = require("./util");
+const trackconfig = require("./trackconfig.json");
 
 let clock = 0;
+let track = -1;
+let swung = false;
+let long_beat = true;
+let samples_to_date = 0;
 
 const udpPort = new osc.UDPPort({
   // My port
   localAddress: "127.0.0.1",
   localPort: 667,
 
-  // SuperCollider's port
+  // Ableton Live's port
   remoteAddress: "127.0.0.1",
   remotePort: 666,
   metadata: true
@@ -58,12 +64,51 @@ function arduinoIn(value) {
       }
       break;
     case "P":
+      util.log("Received message from Samplerella: " + value);
+      sampler.arduinoIn(value);
+      switch (value) {
+        case "PDP":
+          drums.hardStartStop(false);
+          break;
+        case "PDU":
+          drums.hardStartStop(true);
+          clock = 0;
+          break;
+        case "PNT":
+          nextTrack();
+          break;
+      }
       break;
     default:
       util.log("Received message: " + value);
       break;
       //util.error("No matching handler for Arduino message " + value)
   }
+}
+
+function nextTrack() {
+  track++;
+  if (track < trackconfig.length) {
+    let nt = trackconfig[track];
+    util.log("Playing track " + nt.title);
+    swung = nt.swung;
+    if (swung) {
+      tempo = (60 / nt.tempo) * 333.33;
+      long_beat = true;
+    }
+    else {
+      tempo = (60 / nt.tempo) * 250;
+    }
+
+    if (track > 0) {
+      samples_to_date += nt.num_samples;
+    }
+  }
+  else {
+    util.log("Track " + track + " not found; manual config only");
+  }
+
+  sendTrack(track);
 }
 
 function setTempo(value) {
@@ -81,24 +126,17 @@ function setTempo(value) {
   metro = setInterval(beat, tempo);
 }
 
-function sendToSC(a) {
-  let r = Math.random();
-  let msg = {
-    address: "/test",
-    args: [{
-      "type": "i",
-      "value": a
-    }]
-  }
-  util.log("Sending " + a);
-  udpPort.send(msg);
-}
-
-
 function beat() {
   drumbeat();
   melodybeat();
   samplebeat();
+  if (swung) {
+    setTimeout(beat, long_beat ? tempo / 2 : tempo);
+    long_beat = !long_beat;
+  }
+  else {
+    setTimeout(beat, tempo);
+  }
 }
 
 function drumbeat() {
@@ -139,50 +177,41 @@ function melodybeat() {
 }
 
 function samplebeat() {
-  let sample = drums.getSample();
+  let sample = sampler.getSample();
   if (sample !== -1) {
     sendSample(sample);
   }
+
+  if (clock % 64 == 0) {
+    let clip = sampler.getClip();
+    if (clip !== -1) {
+      sendClip(clip);
+    }
+  }
+
+  let effects = sampler.getEffects();
+  if (effects !== -1) {
+    sendVocalEffects(effects);
+  }
+}
+
+function sendTrack(track) {
+  sendOneInt("/track", track);
 }
 
 function sendDrumHit(hit) {
-  let msg = {
-    address: "/drum_hit",
-    args: [
-      {
-        type: "i",
-        value: hit + 60
-      }
-    ]
-  }
-  udpPort.send(msg);
+  sendOneInt("/drum_hit", hit + 60);
 }
 
 function sendDrumEffects(effects) {
-  let msg = {
-    address: "/drum_effects",
-    args: [
-      {
-        type: "i",
-        value: effects
-      }
-    ]
-  }
-  udpPort.send(msg);
-
+  sendOneInt("/drum_effects", effects);
+}
+function sendVocalEffects(effects) {
+  sendOneInt("/vocal_effecs", effects);
 }
 
 function sendNote(note) {
-  let msg = {
-    address: "/note",
-    args: [
-      {
-        type: "i",
-        value: note
-      }
-    ]
-  }
-  udpPort.send(msg)
+  sendOneInt("/note", note);
 }
 
 function sendSample(sample) {
@@ -191,16 +220,20 @@ function sendSample(sample) {
     return;
   }
 
+  sendOneInt("/sample", samples_to_date + sample);
+}
+
+function sendClip(clip) {
+  sendOneInt("/clip", clip);
+}
+
+function sendOneInt(path, val) {
   let msg = {
-    address: "/sample",
+    address: path,
     args: [
-      /*{
-        type: "i",
-        value: sample.track
-      },*/
       {
         type: "i",
-        value: sample
+        value: val
       }
     ]
   }
@@ -214,7 +247,8 @@ udpPort.on("message", function (oscMsg) {
   }
 });
 
-let metro = setInterval(beat, 180);
+nextTrack();
+beat();
 
 /*setTimeout(() => { 
   serialport.write("SC1\n", function(err) {
@@ -226,9 +260,16 @@ let metro = setInterval(beat, 180);
 
 }, 2000);*/
 
-arduinoIn('DBD')
 arduinoIn('DVD')
 arduinoIn('DHG')
+setTimeout(() => {
+  arduinoIn('PDP')
+}, 3000);
+setTimeout(() => {
+  arduinoIn('PDU')
+}, 6000);
+//arduinoIn('PCA')
+//setInterval(() => {arduinoIn('PSA')}, 20000);
 
 /*
 //sendSample(0);

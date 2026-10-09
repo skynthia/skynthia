@@ -1,0 +1,19 @@
+[
+  {
+    "title": "Testimony",
+    "swung": true,
+    "tempo": 104,
+    "num_samples": 1
+  },
+  {
+    "title": "Dorian",
+    "swung": false,
+    "tempo": 130,
+    "num_samples": 1
+  },
+  {
+    "title": "Buy My Course",
+    "swung": false,
+    "tempo": 90
+  }
+]
