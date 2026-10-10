@@ -243,23 +243,14 @@ function sendOneInt(path, val) {
 udpPort.on("message", function (oscMsg) {
   console.log(oscMsg.address + ": " + oscMsg.args[0].value);
   if (sp_connected && oscMsg.args[0].value === 1) {
-    serialport.write("SC1\n");
+    serialport.write("connected\n");
   }
 });
 
 nextTrack();
 beat();
 
-/*setTimeout(() => { 
-  serialport.write("SC1\n", function(err) {
-  if (err) {
-    return console.log('Error on write: ', err.message)
-  }
-  console.log('message written')
-})
-
-}, 2000);*/
-
+/*
 arduinoIn('DVD')
 arduinoIn('DHG')
 setTimeout(() => {
@@ -267,7 +258,7 @@ setTimeout(() => {
 }, 3000);
 setTimeout(() => {
   arduinoIn('PDU')
-}, 6000);
+}, 6000);*/
 //arduinoIn('PCA')
 //setInterval(() => {arduinoIn('PSA')}, 20000);
 

@@ -33,6 +33,8 @@ int eye_calibration[2] = {0, 0};
 long eye_active[2] = {-1, -1};
 long lt_active = -1;
 
+unsigned long ping_clock;
+
 void setup() {
   Serial.begin(9600);
   Serial1.begin(9600);
@@ -61,7 +63,18 @@ void loop() {
   checkTentacles();
   checkTouch();
   checkHaptics();
+  checkPing();
   delay(10);
+}
+
+void checkPing() {
+  // ping every 5 seconds  
+  if (millis() - ping_clock >= 5000) {
+    Serial1.write('G');
+    Serial1.write(1);
+    Serial1.write('\n');
+    ping_clock = millis();
+  }
 }
 
 void checkEyes() {

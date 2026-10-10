@@ -250,17 +250,22 @@ function setDynamism(value) {
 }
 
 function setVibe(value) {
-  vibe = vibeconfig[value];
-  root_voice = vibe.root;
-  next_voice_probs = vibe.probs;
+  if (vibeconfig.length < value) {
+    vibe = vibeconfig[value];
+    root_voice = vibe.root;
+    next_voice_probs = vibe.probs;
 
-  change_pattern = true;
-  change_voices = true;
-  change_all_voices = true;
+    change_pattern = true;
+    change_voices = true;
+    change_all_voices = true;
+  }
 }
 
 function setEffects(value) {
-  effects = value;
+  // effect 0 is MIDI randomness, 1 is drum rack
+  if (value < 3) {
+    effects = value + 2;
+  }
 }
 
 // this is only called at the end of a measure

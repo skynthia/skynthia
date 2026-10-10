@@ -41,7 +41,7 @@ void checkSerialInput() {
     read_byte = HC12.read();
     //Serial.write(read_byte);
     if (read_byte == '\n') {
-      if (read_buffer[0] == 'P') {
+      if (read_buffer[0] == 'G') {
         pinged[atoi(read_buffer[1])] = 255;
         //Serial.println((String) "Pinged by " + read_buffer[1]);
       }
@@ -58,7 +58,7 @@ void checkSerialInput() {
   while (Serial.available()) {
     char c = (char)Serial.read();
     read_from_node += c;
-    if (read_from_node == "SC1") {
+    if (read_from_node == "connected") {
       leds[3] = CRGB(255, 255, 255);
       leds[4] = CRGB(255, 255, 255);
       leds[5] = CRGB(255, 255, 255);
