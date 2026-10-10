@@ -42,11 +42,18 @@ void checkSerialInput() {
     //Serial.write(read_byte);
     if (read_byte == '\n') {
       if (read_buffer[0] == 'G') {
-        pinged[atoi(read_buffer[1])] = 255;
+        int idx = read_buffer[1] - 48;
+        pinged[idx] = 255;
         //Serial.println((String) "Pinged by " + read_buffer[1]);
       }
       else {
         Serial.println(read_buffer);
+        if (read_buffer[0] == 'D') {
+          pinged[0] = 255;
+        }
+        else if (read_buffer[0] == 'P') {
+          pinged[1] = 255;
+        }
       }
       read_buffer = "";
     }
@@ -70,7 +77,8 @@ void checkSerialInput() {
 void updateLEDs() {
   for (int i = 0; i < 3; i++) {
     if (pinged[i] > 0) {
-      pinged[i] -= 2;
+      pinged[i]--;
+      pinged[i] = max(0, pinged[i]);
       leds[i] = CRGB(0, pinged[i], 0);
       
     }
