@@ -273,7 +273,7 @@ void transmit(String val) {
 }
 
 void checkPing() {
-  if (millis() - ping_clock > 10000) {
+  if (millis() - ping_clock > 60000) {
     transmit("G1");
   }
 }
