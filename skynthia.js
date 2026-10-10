@@ -88,7 +88,8 @@ function arduinoIn(value) {
 }
 
 function nextTrack() {
-  track++;
+  track = (track + 1) % trackconfig.length;
+  // eventually allow to go off the edge, but not yet
   if (track < trackconfig.length) {
     let nt = trackconfig[track];
     util.log("Playing track " + nt.title);
