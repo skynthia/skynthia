@@ -51,6 +51,7 @@ void setup() {
   dyn_start = tempo_start = ping_clock = millis();
   
   randomSeed(analogRead(A15));
+  transmit("G0");
 }
 
 void loop() {
@@ -66,7 +67,7 @@ void transmit(String val) {
 
 void checkPing() {
   // ping every 10 seconds, if we haven't sent another message
-  if (millis() - ping_clock >= 10000) {
+  if (millis() - ping_clock >= 60000) {
     transmit("G0");
   }
 }

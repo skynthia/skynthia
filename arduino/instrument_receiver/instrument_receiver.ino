@@ -28,7 +28,7 @@ void setup() {
 
 void loop() {
   checkSerialInput();
-  if (millis() - led_clock > 40) {
+  if (millis() - led_clock > 256) {
     updateLEDs();
     led_clock = millis();
   }
