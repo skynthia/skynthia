@@ -16,7 +16,7 @@ let samples_to_date = 0;
 const udpPort = new osc.UDPPort({
   // My port
   localAddress: "127.0.0.1",
-  localPort: 668,
+  localPort: 667,
 
   // Ableton Live's port
   remoteAddress: "127.0.0.1",
@@ -93,12 +93,13 @@ function nextTrack() {
     let nt = trackconfig[track];
     util.log("Playing track " + nt.title);
     swung = nt.swung;
+    sendOneInt("/tempo", nt.tempo);
     if (swung) {
       tempo = (60 / nt.tempo) * 666.67;
       long_beat = true;
     }
     else {
-      tempo = (60 / nt.tempo) * 250;
+      tempo = (60 / nt.tempo) * 500;
     }
 
     if (track > 0) {
