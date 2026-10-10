@@ -59,11 +59,15 @@ void loop() {
   doHaptics();
 }
 
+void transmit(String val) {
+  Serial1.println(val);
+  ping_clock = millis();
+}
+
 void checkPing() {
-  // ping every 5 seconds  
-  if (millis() - ping_clock >= 5000) {
-    Serial1.println("G0");
-    ping_clock = millis();
+  // ping every 10 seconds, if we haven't sent another message
+  if (millis() - ping_clock >= 10000) {
+    transmit("G0");
   }
 }
 
@@ -148,6 +152,7 @@ void sendToServer(int which, int val) {
   Serial1.write(input_name);
   Serial1.write(val + 65); // val max is 15
   Serial1.write('\n');
+  ping_clock = millis();
 }
 
 void checkDyn() {
@@ -211,4 +216,5 @@ void sendTempoToServer(float tempo) {
   Serial1.write('T');
   Serial1.print(String(tempo_int));
   Serial1.write('\n');
+  ping_clock = millis();
 }
