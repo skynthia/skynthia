@@ -61,8 +61,8 @@
 			},
 			{
 				"prob": 0.6,
-				"voices": [ 5, 15],
-				"voice_names": [ "open_hat", "extra_low" ]
+				"voices": [ 15],
+				"voice_names": [ "extra_low" ]
 			},
 			{
 				"prob": 0.5,

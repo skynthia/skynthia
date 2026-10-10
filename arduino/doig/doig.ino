@@ -62,9 +62,7 @@ void loop() {
 void checkPing() {
   // ping every 5 seconds  
   if (millis() - ping_clock >= 5000) {
-    Serial1.write('G');
-    Serial1.write(0);
-    Serial1.write('\n');
+    Serial1.println("G0");
     ping_clock = millis();
   }
 }

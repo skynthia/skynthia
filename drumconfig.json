@@ -416,8 +416,12 @@
     "equal_prob": false,
     "probs": [
       {
+        "prob": 1,
+        "notes": [0]
+      },
+      {
         "prob": 0.9,
-        "notes": [0, 4, 8, 12]
+        "notes": [4, 8, 12]
       },
       {
         "prob": 0.7,

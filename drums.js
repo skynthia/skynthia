@@ -170,7 +170,9 @@ function generateVoices() {
   if (diff > 0) {
     for (let i = 0; i < diff; i++) {
       let added_voice = false;
-      while(!added_voice) {
+      let attempts = 0;
+      while(!added_voice && attempts < 1000) {
+        attempts++;
         for (let j = 0; j < next_voice_probs.length; j++) {
           let rand = Math.random();
           if (rand < next_voice_probs[j].prob) {
@@ -250,10 +252,10 @@ function setDynamism(value) {
 }
 
 function setVibe(value) {
-  if (vibeconfig.length < value) {
+  if (value < vibeconfig.length) {
     vibe = vibeconfig[value];
     root_voice = vibe.root;
-    next_voice_probs = vibe.probs;
+    next_voice_probs = JSON.parse(JSON.stringify(vibe.probs));
 
     change_pattern = true;
     change_voices = true;
@@ -263,8 +265,8 @@ function setVibe(value) {
 
 function setEffects(value) {
   // effect 0 is MIDI randomness, 1 is drum rack
-  if (value < 3) {
-    effects = value + 2;
+  if (value < 4) {
+    effects = value + 1;
   }
 }
 

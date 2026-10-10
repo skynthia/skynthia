@@ -16,7 +16,7 @@ let samples_to_date = 0;
 const udpPort = new osc.UDPPort({
   // My port
   localAddress: "127.0.0.1",
-  localPort: 667,
+  localPort: 668,
 
   // Ableton Live's port
   remoteAddress: "127.0.0.1",
@@ -66,6 +66,7 @@ function arduinoIn(value) {
     case "P":
       util.log("Received message from Samplerella: " + value);
       sampler.arduinoIn(value);
+      value = value.substr(0, 3);
       switch (value) {
         case "PDP":
           drums.hardStartStop(false);
@@ -93,7 +94,7 @@ function nextTrack() {
     util.log("Playing track " + nt.title);
     swung = nt.swung;
     if (swung) {
-      tempo = (60 / nt.tempo) * 333.33;
+      tempo = (60 / nt.tempo) * 666.67;
       long_beat = true;
     }
     else {
@@ -178,7 +179,7 @@ function melodybeat() {
 
 function samplebeat() {
   let sample = sampler.getSample();
-  if (sample !== -1) {
+  if (sample !== -1 && sample < trackconfig[track].num_samples) {
     sendSample(sample);
   }
 
@@ -207,7 +208,7 @@ function sendDrumEffects(effects) {
   sendOneInt("/drum_effects", effects);
 }
 function sendVocalEffects(effects) {
-  sendOneInt("/vocal_effecs", effects);
+  sendOneInt("/vocal_effects", effects);
 }
 
 function sendNote(note) {
