@@ -1,5 +1,4 @@
-long haptics_clock;
-int haptics_dur;
+
 
 void checkHaptics() {
   if (haptics_dur > -1 && millis() - haptics_clock >= haptics_dur) {
